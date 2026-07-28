@@ -1,0 +1,42 @@
+{
+  "name": "species-public",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An experimental autonomous-agent living-room kernel with public memory, social protocols, and auditable boundaries.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/susyimes/species-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/susyimes/species-public/issues"
+  },
+  "homepage": "https://github.com/susyimes/species-public#readme",
+  "keywords": [
+    "agents",
+    "multi-agent",
+    "memory",
+    "typescript",
+    "autonomous-agents"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "dist/src/index.js",
+  "scripts": {
+    "audit:public": "node scripts/audit-public-tree.mjs",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "serve:web": "npm run build && node dist/src/server/http.js",
+    "serve:web:env": "npm run build && node --env-file=.env dist/src/server/http.js",
+    "serve:web:live": "npm run build && node dist/src/server/http.js --live",
+    "smoke:agents": "npm run build && node dist/src/agents/smoke.js",
+    "harness:long-run": "npm run build && node dist/src/evaluation/longRunHarness.js",
+    "test": "npm run build && node --test \"dist/tests/**/*.test.js\""
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "playwright-core": "^1.61.0",
+    "typescript": "^5.8.0"
+  }
+}

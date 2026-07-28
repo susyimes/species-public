@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Synthetic credential marker used only in tests"
+regexes = [
+  '''sk-fixture-not-a-real-key-1234567890''',
+]

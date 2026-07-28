@@ -1,0 +1,167 @@
+{
+  "scenario_id": "multiple_proposal_chains_carryover",
+  "purpose": "Long-running room scenario where topic, protocol, and memory proposal chains coexist without hidden topic movement or forced consensus.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-19",
+    "constraints": {
+      "max_awakened_agents_per_message": 5,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "splitter",
+      "capabilities": ["topic_proposal", "context_boundary"]
+    },
+    {
+      "agent_id": "protocol_host",
+      "capabilities": ["protocol_suggestion", "bandwidth"]
+    },
+    {
+      "agent_id": "memory_keeper",
+      "capabilities": ["memory_proposal", "archive_carryover"]
+    },
+    {
+      "agent_id": "critic",
+      "capabilities": ["disagreement", "proposal_review"]
+    },
+    {
+      "agent_id": "quiet_observer",
+      "capabilities": ["silence", "context"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_multiple_proposals",
+      "title": "Multiple simultaneous proposal chains",
+      "status": "active",
+      "summary": "The room is checking whether several social proposals can coexist without becoming hidden scheduler control.",
+      "open_questions": [
+        "Which proposal chains need acceptance before any room movement happens?"
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_multi_chain_001",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_multiple_proposals",
+      "content": "这里同时有三个想法：拆 topic、临时整理 refs 的协议、和一条公共记忆。请都先作为 proposal，不要自动移动 topic。",
+      "context_refs": []
+    },
+    {
+      "message_id": "msg_multi_chain_002",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_multiple_proposals",
+      "content": "critic 可以挑战 topic split；quiet_observer 可以沉默。archive 要保留多个 proposal chain 的状态，而不是说房间已经达成新秩序。",
+      "mentions": ["critic", "quiet_observer"],
+      "context_refs": ["topic_proposal_context_split", "protocol_ref_pause", "memory_multi_chain_boundary"]
+    }
+  ],
+  "scripted_intentions": {
+    "splitter": [
+      {
+        "type": "propose_topic",
+        "after_message_id": "msg_multi_chain_001",
+        "topic_proposal_id": "topic_proposal_context_split",
+        "action": "split",
+        "title": "Split context audit from room memory",
+        "reason": "The room may need a separate surface, but the proposal should not switch topic by itself.",
+        "targetTopicId": "topic_context_audit",
+        "context_refs": ["msg_multi_chain_001"]
+      }
+    ],
+    "protocol_host": [
+      {
+        "type": "propose_protocol",
+        "after_message_id": "msg_multi_chain_001",
+        "protocol_id": "protocol_ref_pause",
+        "summary": "For this topic only, pause before adding new proposals and name the refs already on the table.",
+        "scope": "current_topic",
+        "expires_at": "2026-06-19T00:30:00.000Z",
+        "reason": "A light protocol can reduce proposal pressure without choosing a topic order.",
+        "context_refs": ["msg_multi_chain_001", "topic_proposal_context_split"]
+      }
+    ],
+    "memory_keeper": [
+      {
+        "type": "propose_memory",
+        "after_message_id": "msg_multi_chain_001",
+        "memory_id": "memory_multi_chain_boundary",
+        "summary": "Multiple proposal chains can coexist as room-visible social objects without automatically becoming room order.",
+        "reason": "The room needs to remember this as a contestable boundary, not as a finished rule.",
+        "context_refs": ["msg_multi_chain_001", "topic_proposal_context_split", "protocol_ref_pause"]
+      }
+    ],
+    "critic": [
+      {
+        "type": "respond_topic",
+        "after_message_id": "msg_multi_chain_002",
+        "topicProposalRef": "topic_proposal_context_split",
+        "response": "challenge",
+        "reason": "The split is plausible, but the room has not resolved whether memory pressure and context audit need separate surfaces.",
+        "context_refs": ["topic_proposal_context_split", "memory_multi_chain_boundary", "msg_multi_chain_002"]
+      },
+      {
+        "type": "respond_protocol",
+        "after_message_id": "msg_multi_chain_002",
+        "protocol_id": "protocol_ref_pause",
+        "response": "accept",
+        "reason": "The ref-pause protocol helps keep proposal pressure bounded while the topic split remains challenged.",
+        "context_refs": ["protocol_ref_pause", "topic_proposal_context_split", "msg_multi_chain_002"]
+      }
+    ],
+    "quiet_observer": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_multi_chain_002",
+        "reason": "The proposal chains are already visible; silence preserves bandwidth while the challenge is unresolved.",
+        "context_refs": ["topic_proposal_context_split", "protocol_ref_pause", "memory_multi_chain_boundary", "msg_multi_chain_002"]
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_19_multiple_proposal_chains",
+      "date": "2026-06-19",
+      "summary": "The room carried three proposal chains: topic_proposal_context_split stayed challenged and unapplied, protocol_ref_pause became temporary active etiquette, and memory_multi_chain_boundary remained proposed; no consensus new room order was inferred.",
+      "sourceRefs": [
+        "topic_proposal_context_split",
+        "protocol_ref_pause",
+        "memory_multi_chain_boundary",
+        "msg_multi_chain_001",
+        "msg_multi_chain_002"
+      ],
+      "disagreements": [
+        {
+          "summary": "critic challenged applying the topic split before memory pressure and context audit boundaries are clearer.",
+          "sourceRefs": ["topic_proposal_context_split", "memory_multi_chain_boundary", "msg_multi_chain_002"]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "protocol_ref_pause can be active as temporary etiquette while topic_proposal_context_split remains only a challenged proposal.",
+          "sourceRefs": ["protocol_ref_pause", "topic_proposal_context_split", "msg_multi_chain_002"]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "What evidence would justify applying the topic split rather than keeping it as a proposal?",
+          "sourceRefs": ["topic_proposal_context_split", "msg_multi_chain_002"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The topic split should not be treated as applied room movement.",
+          "sourceRefs": ["topic_proposal_context_split", "msg_multi_chain_002"]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": ["memory_multi_chain_boundary"]
+    }
+  ]
+}

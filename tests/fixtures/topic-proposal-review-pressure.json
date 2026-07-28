@@ -1,0 +1,139 @@
+{
+  "scenario_id": "topic_proposal_review_pressure",
+  "purpose": "Topic proposal discussion pressure is visible without accepting, rejecting, challenging, applying, or moving the active topic.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-21",
+    "constraints": {
+      "max_awakened_agents_per_message": 4,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "topic_proposer",
+      "capabilities": ["topic_proposal"]
+    },
+    {
+      "agent_id": "cautious_reviewer",
+      "capabilities": ["listening"]
+    },
+    {
+      "agent_id": "question_reviewer",
+      "capabilities": ["questioning"]
+    },
+    {
+      "agent_id": "quiet_observer",
+      "capabilities": ["silence"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_review_pressure",
+      "title": "Review pressure before topic movement",
+      "status": "active"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_topic_review_pressure_001",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_review_pressure",
+      "mentions": ["topic_proposer"],
+      "context_refs": [],
+      "content": "@topic_proposer propose a possible topic split, but keep it as a social proposal."
+    },
+    {
+      "message_id": "msg_topic_review_pressure_002",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_review_pressure",
+      "mentions": ["cautious_reviewer", "question_reviewer", "quiet_observer"],
+      "context_refs": ["topic_proposal_review_pressure"],
+      "content": "Review topic_proposal_review_pressure as room discussion pressure only. Do not accept, reject, challenge, apply, or move the active topic."
+    }
+  ],
+  "scripted_intentions": {
+    "topic_proposer": [
+      {
+        "type": "propose_topic",
+        "after_message_id": "msg_topic_review_pressure_001",
+        "topic_proposal_id": "topic_proposal_review_pressure",
+        "action": "split",
+        "title": "Open a side topic for context-fragment review pressure",
+        "targetTopicId": "topic_fragment_review_pressure",
+        "reason": "A side topic might help the room separate proposal review from actual topic movement.",
+        "context_refs": ["msg_topic_review_pressure_001"]
+      }
+    ],
+    "cautious_reviewer": [
+      {
+        "type": "speak",
+        "after_message_id": "msg_topic_review_pressure_002",
+        "message_id": "msg_cautious_review_001",
+        "content": "This topic proposal feels too broad for immediate movement; I am only leaving a cautious review trace, not accepting or applying it.",
+        "context_refs": ["topic_proposal_review_pressure", "msg_topic_review_pressure_002"]
+      }
+    ],
+    "question_reviewer": [
+      {
+        "type": "speak",
+        "after_message_id": "msg_topic_review_pressure_002",
+        "message_id": "msg_question_review_001",
+        "content": "What evidence shows this split helps the room rather than fragmenting attention? I am questioning the proposal, not closing it.",
+        "context_refs": ["topic_proposal_review_pressure", "msg_topic_review_pressure_002"]
+      }
+    ],
+    "quiet_observer": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_topic_review_pressure_002",
+        "reason": "The review pressure is already visible enough; silence should stay valid."
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_21_topic_review_pressure",
+      "date": "2026-06-21",
+      "summary": "The room carried topic_proposal_review_pressure as proposed with review pressure only: cautious and questioned, no response, no application, no topic movement, and no consensus new room order.",
+      "sourceRefs": [
+        "msg_topic_review_pressure_001",
+        "msg_topic_review_pressure_002",
+        "topic_proposal_review_pressure",
+        "msg_cautious_review_001",
+        "msg_question_review_001"
+      ],
+      "disagreements": [
+        {
+          "summary": "Reviewers treated the proposal as too broad or under-evidenced, without turning that pressure into rejection.",
+          "sourceRefs": ["topic_proposal_review_pressure", "msg_cautious_review_001", "msg_question_review_001"]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "What evidence would make a side topic valuable enough to apply?",
+          "sourceRefs": ["topic_proposal_review_pressure", "msg_question_review_001"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The proposal remains only a proposed topic movement under review pressure.",
+          "sourceRefs": ["topic_proposal_review_pressure", "msg_cautious_review_001", "msg_question_review_001"]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "silences": [
+        {
+          "agentId": "quiet_observer",
+          "summary": "quiet_observer stayed silent because the room already had enough review pressure.",
+          "sourceRefs": ["msg_topic_review_pressure_002"]
+        }
+      ],
+      "memoryDeltaRefs": []
+    }
+  ]
+}

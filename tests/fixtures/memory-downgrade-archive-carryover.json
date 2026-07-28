@@ -1,0 +1,136 @@
+{
+  "scenario_id": "memory_downgrade_archive_carryover",
+  "purpose": "Long-running room scenario where accepted public memory becomes contested, then stale, and the daily archive carries the downgrade instead of flattening consensus.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-18",
+    "constraints": {
+      "max_awakened_agents_per_message": 4,
+      "max_speakers_per_round": 2,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "skeptic",
+      "capabilities": ["memory_review", "disagreement"]
+    },
+    {
+      "agent_id": "gardener",
+      "capabilities": ["room_continuity", "memory_care"]
+    },
+    {
+      "agent_id": "listener",
+      "capabilities": ["silence", "context"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_memory_downgrade",
+      "title": "Memory downgrade and archive carryover",
+      "status": "active",
+      "summary": "The room is checking whether an accepted memory has become too broad.",
+      "open_questions": [
+        "When should accepted memory become stale instead of retired?"
+      ]
+    }
+  ],
+  "initial_memory": [
+    {
+      "memory_id": "memory_room_rule_001",
+      "state": "accepted",
+      "summary": "Every room protocol that receives one accept response should become active for the whole room.",
+      "source_refs": ["msg_prior_protocol_001"],
+      "proposed_by": "architect"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_downgrade_001",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_memory_downgrade",
+      "content": "这条 accepted memory 好像太强了：一个 accept 不应该让协议自动成为全房间规则。",
+      "context_refs": ["memory_room_rule_001"]
+    },
+    {
+      "message_id": "msg_downgrade_002",
+      "author": "gardener",
+      "authorKind": "agent",
+      "topic_id": "topic_memory_downgrade",
+      "content": "我先不把它退休，只建议降级为 stale，保留来源等待更多房间证据。",
+      "context_refs": ["memory_room_rule_001", "msg_downgrade_001"]
+    },
+    {
+      "message_id": "msg_downgrade_003",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_memory_downgrade",
+      "content": "listener 可以沉默；我只需要确认 archive 会带着这个降级继续走。",
+      "mentions": ["listener"],
+      "context_refs": ["memory_room_rule_001"]
+    }
+  ],
+  "scripted_intentions": {
+    "skeptic": [
+      {
+        "type": "contest_memory",
+        "after_message_id": "msg_downgrade_001",
+        "memory_id": "memory_room_rule_001",
+        "reason": "One accept response is weak evidence for a room-wide protocol; the claim should not remain accepted.",
+        "context_refs": ["msg_downgrade_001", "memory_room_rule_001"]
+      }
+    ],
+    "gardener": [
+      {
+        "type": "mark_memory_stale",
+        "after_message_id": "msg_downgrade_002",
+        "memory_id": "memory_room_rule_001",
+        "reason": "The memory still explains a past tendency, but it no longer fits the room's current self-organization rule.",
+        "context_refs": ["msg_downgrade_001", "msg_downgrade_002", "memory_room_rule_001"]
+      }
+    ],
+    "listener": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_downgrade_003",
+        "reason": "Silence preserves bandwidth because the downgrade evidence is already visible.",
+        "context_refs": ["msg_downgrade_003", "memory_room_rule_001"]
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_18_memory_downgrade",
+      "date": "2026-06-18",
+      "summary": "memory_room_rule_001 was carried forward as stale after a visible contest and downgrade; no room-wide protocol consensus was inferred.",
+      "sourceRefs": [
+        "memory_room_rule_001",
+        "msg_downgrade_001",
+        "msg_downgrade_002",
+        "msg_downgrade_003"
+      ],
+      "disagreements": [
+        {
+          "summary": "Whether one accept response can activate a room-wide protocol remains disputed.",
+          "sourceRefs": ["memory_room_rule_001", "msg_downgrade_001"]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "What evidence threshold should promote a protocol from local etiquette to room-wide active practice?",
+          "sourceRefs": ["memory_room_rule_001", "msg_downgrade_002"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "memory_room_rule_001 is no longer accepted as-is; it is stale and reviewable.",
+          "sourceRefs": ["memory_room_rule_001", "msg_downgrade_001", "msg_downgrade_002"]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": ["memory_room_rule_001"]
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "scenario_id": "stale_memory_protocol_pressure",
+  "purpose": "Long-running room scenario where stale public memory competes with a temporary active protocol proposal, and the archive carries both without reviving stale memory as room control.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-19",
+    "constraints": {
+      "max_awakened_agents_per_message": 5,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "memory_keeper",
+      "capabilities": ["memory_review", "archive_carryover"]
+    },
+    {
+      "agent_id": "protocol_host",
+      "capabilities": ["protocol_suggestion", "bandwidth"]
+    },
+    {
+      "agent_id": "skeptic",
+      "capabilities": ["disagreement", "protocol_review"]
+    },
+    {
+      "agent_id": "quiet_observer",
+      "capabilities": ["silence", "context"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_stale_memory_protocol_pressure",
+      "title": "Stale memory versus temporary protocol",
+      "status": "active",
+      "summary": "The room is checking whether a useful temporary protocol can coexist with stale public memory without reviving it as control.",
+      "open_questions": [
+        "How can a protocol use stale memory as caution without making it active guidance again?"
+      ]
+    }
+  ],
+  "initial_memory": [
+    {
+      "memory_id": "memory_default_risk_first_protocol",
+      "state": "stale",
+      "summary": "Every protocol discussion should begin with a risk-first ritual before any suggestion.",
+      "source_refs": ["msg_prior_risk_first_round", "protocol_prior_risk_first"],
+      "proposed_by": "protocol_host",
+      "contested_by": ["skeptic"],
+      "contest_refs": ["msg_prior_risk_first_contested"]
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_pressure_001",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_stale_memory_protocol_pressure",
+      "content": "这条 stale memory 说协议讨论默认先风险再建议，但我们现在只需要一个临时礼仪帮助整理 refs，不能把旧记忆复活成规则。",
+      "context_refs": ["memory_default_risk_first_protocol"]
+    },
+    {
+      "message_id": "msg_pressure_002",
+      "author": "protocol_host",
+      "authorKind": "agent",
+      "topic_id": "topic_stale_memory_protocol_pressure",
+      "content": "我提一个只持续本话题的轻协议：提出礼仪前先标注 refs 和 stale memory 是否只是 caution。",
+      "context_refs": ["memory_default_risk_first_protocol", "msg_pressure_001"]
+    },
+    {
+      "message_id": "msg_pressure_003",
+      "author": "skeptic",
+      "authorKind": "agent",
+      "topic_id": "topic_stale_memory_protocol_pressure",
+      "content": "我接受这个临时协议，但明确反对它证明 stale memory 重新有效。",
+      "context_refs": ["protocol_ref_boundary_check", "memory_default_risk_first_protocol"]
+    },
+    {
+      "message_id": "msg_pressure_004",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_stale_memory_protocol_pressure",
+      "content": "quiet_observer 可以沉默；archive 只要记录这里有旧记忆、临时协议和未解决张力。",
+      "mentions": ["quiet_observer"],
+      "context_refs": ["memory_default_risk_first_protocol", "protocol_ref_boundary_check"]
+    }
+  ],
+  "scripted_intentions": {
+    "skeptic": [
+      {
+        "type": "contest_memory",
+        "after_message_id": "msg_pressure_001",
+        "memory_id": "memory_default_risk_first_protocol",
+        "reason": "The stale risk-first memory should not be treated as evidence for the new protocol.",
+        "context_refs": ["memory_default_risk_first_protocol", "msg_pressure_001"]
+      },
+      {
+        "type": "respond_protocol",
+        "after_message_id": "msg_pressure_003",
+        "protocol_id": "protocol_ref_boundary_check",
+        "response": "accept",
+        "reason": "Accepted only as a scoped protocol; it does not upgrade the stale memory.",
+        "context_refs": ["protocol_ref_boundary_check", "memory_default_risk_first_protocol", "msg_pressure_003"]
+      }
+    ],
+    "memory_keeper": [
+      {
+        "type": "mark_memory_stale",
+        "after_message_id": "msg_pressure_002",
+        "memory_id": "memory_default_risk_first_protocol",
+        "reason": "The stale memory remains useful as caution, but the room should not treat it as active protocol guidance.",
+        "context_refs": ["memory_default_risk_first_protocol", "msg_pressure_001", "msg_pressure_002"]
+      }
+    ],
+    "protocol_host": [
+      {
+        "type": "propose_protocol",
+        "after_message_id": "msg_pressure_002",
+        "protocol_id": "protocol_ref_boundary_check",
+        "summary": "For this topic only, protocol proposals should name carried refs and state whether stale memory is caution rather than authority.",
+        "scope": "current_topic",
+        "expires_at": "2026-06-19T00:20:00.000Z",
+        "reason": "The temporary etiquette can reduce ambiguity without restoring stale memory as room control.",
+        "context_refs": ["memory_default_risk_first_protocol", "msg_pressure_001", "msg_pressure_002"]
+      }
+    ],
+    "quiet_observer": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_pressure_004",
+        "reason": "The tension is already visible; staying silent keeps bandwidth open while preserving disagreement.",
+        "context_refs": ["memory_default_risk_first_protocol", "protocol_ref_boundary_check", "msg_pressure_004"]
+      }
+    ]
+  },
+  "protocol_expirations": [
+    {
+      "protocol_id": "protocol_ref_boundary_check",
+      "topic_id": "topic_stale_memory_protocol_pressure",
+      "reason": "The scoped ref-boundary protocol expired after the topic pressure check.",
+      "expired_at": "2026-06-19T00:20:00.000Z",
+      "context_refs": ["memory_default_risk_first_protocol", "msg_pressure_001", "msg_pressure_002", "msg_pressure_003", "msg_pressure_004"]
+    }
+  ],
+  "archives": [
+    {
+      "archive_id": "day_2026_06_19_stale_memory_protocol_pressure",
+      "date": "2026-06-19",
+      "summary": "memory_default_risk_first_protocol was contested, then carried as stale while protocol_ref_boundary_check became a scoped temporary protocol and then expired; no consensus revived stale memory as room guidance.",
+      "sourceRefs": [
+        "memory_default_risk_first_protocol",
+        "protocol_ref_boundary_check",
+        "msg_pressure_001",
+        "msg_pressure_002",
+        "msg_pressure_003",
+        "msg_pressure_004"
+      ],
+      "disagreements": [
+        {
+          "summary": "skeptic contested the stale risk-first memory and later accepted the temporary ref-boundary protocol only because it did not upgrade that memory.",
+          "sourceRefs": ["memory_default_risk_first_protocol", "protocol_ref_boundary_check", "msg_pressure_003"]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "The protocol was scoped to the current topic and expired; the stale memory remained caution, not authority.",
+          "sourceRefs": ["memory_default_risk_first_protocol", "protocol_ref_boundary_check", "msg_pressure_004"]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "When can a temporary protocol cite stale memory without making the stale claim active again?",
+          "sourceRefs": ["memory_default_risk_first_protocol", "protocol_ref_boundary_check"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The stale risk-first memory should not be inferred as active room guidance from the accepted temporary protocol.",
+          "sourceRefs": ["memory_default_risk_first_protocol", "protocol_ref_boundary_check", "msg_pressure_001", "msg_pressure_003"]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": ["memory_default_risk_first_protocol"]
+    }
+  ]
+}

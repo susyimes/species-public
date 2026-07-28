@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+.DS_Store
+.species/
+.species*.log
+node_modules/
+dist/
+coverage/
+.gitleaks-report.*

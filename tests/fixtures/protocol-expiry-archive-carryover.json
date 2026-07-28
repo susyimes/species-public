@@ -1,0 +1,140 @@
+{
+  "scenario_id": "protocol_expiry_archive_carryover",
+  "purpose": "Long-running room scenario where a temporary protocol is proposed, accepted, expires, and the archive carries it as history rather than active room control.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-18",
+    "constraints": {
+      "max_awakened_agents_per_message": 4,
+      "max_speakers_per_round": 2,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "facilitator",
+      "capabilities": ["protocol_suggestion"]
+    },
+    {
+      "agent_id": "critic",
+      "capabilities": ["protocol_review", "disagreement"]
+    },
+    {
+      "agent_id": "listener",
+      "capabilities": ["silence", "bandwidth"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_protocol_expiry",
+      "title": "Protocol expiry and carryover",
+      "status": "active",
+      "summary": "The room is checking whether accepted soft protocols expire instead of becoming permanent scheduler rules.",
+      "open_questions": [
+        "How should expired protocol history guide later conversation without commanding it?"
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_protocol_001",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_protocol_expiry",
+      "content": "我们试一个只持续一次话题轮次的协议：每个发言者先说风险，再说建议。",
+      "context_refs": []
+    },
+    {
+      "message_id": "msg_protocol_002",
+      "author": "critic",
+      "authorKind": "agent",
+      "topic_id": "topic_protocol_expiry",
+      "content": "我同意它作为短期礼仪，但反对它自动变成永久房间规则。",
+      "context_refs": ["protocol_one_turn_risk"]
+    },
+    {
+      "message_id": "msg_protocol_003",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_protocol_expiry",
+      "content": "这个协议结束后，listener 可以沉默；archive 只需要记录它过期了。",
+      "mentions": ["listener"],
+      "context_refs": ["protocol_one_turn_risk"]
+    }
+  ],
+  "scripted_intentions": {
+    "facilitator": [
+      {
+        "type": "propose_protocol",
+        "after_message_id": "msg_protocol_001",
+        "protocol_id": "protocol_one_turn_risk",
+        "summary": "For one bounded round, speakers name one risk before one suggestion.",
+        "scope": "current_topic",
+        "expires_at": "2026-06-18T00:10:00.000Z",
+        "reason": "A short ritual can surface disagreement without becoming room control.",
+        "context_refs": ["msg_protocol_001"]
+      }
+    ],
+    "critic": [
+      {
+        "type": "respond_protocol",
+        "after_message_id": "msg_protocol_002",
+        "protocol_id": "protocol_one_turn_risk",
+        "response": "accept",
+        "reason": "The protocol is safe only while it remains explicitly timeboxed.",
+        "context_refs": ["protocol_one_turn_risk", "msg_protocol_002"]
+      }
+    ],
+    "listener": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_protocol_003",
+        "reason": "The expiry boundary is already visible; silence preserves room bandwidth.",
+        "context_refs": ["protocol_one_turn_risk", "msg_protocol_003"]
+      }
+    ]
+  },
+  "protocol_expirations": [
+    {
+      "protocol_id": "protocol_one_turn_risk",
+      "topic_id": "topic_protocol_expiry",
+      "reason": "The one-round protocol reached its explicit timebox and left effective context.",
+      "expired_at": "2026-06-18T00:10:00.000Z",
+      "context_refs": ["msg_protocol_001", "msg_protocol_002", "msg_protocol_003"]
+    }
+  ],
+  "archives": [
+    {
+      "archive_id": "day_2026_06_18_protocol_expiry",
+      "date": "2026-06-18",
+      "summary": "protocol_one_turn_risk was proposed and accepted as a temporary etiquette, then expired; it remains historical guidance, not an active room rule.",
+      "sourceRefs": [
+        "protocol_one_turn_risk",
+        "msg_protocol_001",
+        "msg_protocol_002",
+        "msg_protocol_003"
+      ],
+      "disagreements": [
+        {
+          "summary": "critic accepted the timebox while objecting to permanent protocol promotion.",
+          "sourceRefs": ["protocol_one_turn_risk", "msg_protocol_002"]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "The one-round risk-first etiquette expired and should not be treated as active.",
+          "sourceRefs": ["protocol_one_turn_risk", "msg_protocol_003"]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "When should an expired protocol be proposed again rather than silently reused?",
+          "sourceRefs": ["protocol_one_turn_risk", "msg_protocol_003"]
+        }
+      ],
+      "contestedItems": [],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": []
+    }
+  ]
+}

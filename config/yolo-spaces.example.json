@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "spaces": [
+    {
+      "id": "disposable-workshop",
+      "label": "Disposable Species workshop",
+      "root": "/absolute/path/to/a/disposable-workshop",
+      "enabled": false,
+      "allowedAgents": [],
+      "maxInputBytes": 262144
+    }
+  ]
+}

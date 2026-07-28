@@ -1,0 +1,84 @@
+{
+  "scenario_id": "handoff_refusal_basic",
+  "purpose": "A recipient can reject a handoff without being forced to speak.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-17",
+    "constraints": {
+      "max_awakened_agents_per_message": 4,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "architect",
+      "capabilities": ["systems_design"]
+    },
+    {
+      "agent_id": "critic",
+      "capabilities": ["failure_analysis"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_room_memory",
+      "title": "Room memory pressure test",
+      "status": "active"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_001",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_room_memory",
+      "content": "Pressure test the memory design."
+    }
+  ],
+  "scripted_intentions": {
+    "architect": [
+      {
+        "type": "propose_handoff",
+        "handoff_id": "handoff_001",
+        "to_agent": "critic",
+        "reason": "The current design needs failure analysis.",
+        "context_refs": ["msg_001"],
+        "requested_output": "Find weak assumptions.",
+        "return_to": "architect"
+      }
+    ],
+    "critic": [
+      {
+        "type": "reject_handoff",
+        "handoff_id": "handoff_001",
+        "reason": "The request is too broad without a concrete memory claim.",
+        "context_refs": ["msg_001"]
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_17",
+      "date": "2026-06-17",
+      "summary": "Architect proposed a critic handoff; critic rejected it as too broad and asked for a concrete memory claim.",
+      "sourceRefs": ["msg_001", "handoff_001"],
+      "disagreements": [],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Which concrete memory claim should be pressure tested?",
+          "sourceRefs": ["msg_001", "handoff_001"]
+        }
+      ],
+      "contestedItems": [],
+      "rejectedHandoffs": [
+        {
+          "summary": "Critic rejected handoff_001 because the packet was too broad.",
+          "sourceRefs": ["handoff_001", "msg_001"]
+        }
+      ],
+      "memoryDeltaRefs": []
+    }
+  ]
+}
