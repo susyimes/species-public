@@ -224,9 +224,8 @@ export function createSpeciesHttpServer(options: SpeciesHttpServerOptions = {}) 
       }
 
       await serveStatic(response, webRoot, url.pathname);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      await sendJson(response, { error: message }, 500);
+    } catch {
+      await sendJson(response, { error: "Internal server error" }, 500);
     }
   });
 }

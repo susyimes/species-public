@@ -79,6 +79,26 @@ test("http server requires explicit opt-in for file and cross-local origins", as
   }
 });
 
+test("http server does not expose internal error details", async () => {
+  const webRoot = await mkdtemp(path.join(tmpdir(), "species-web-error-redaction-"));
+  await writeFile(path.join(webRoot, "index.html"), "<!doctype html><title>species</title>");
+  const runtime = new SpeciesRoomRuntime({ ledgerPath: path.join(webRoot, "room-ledger.jsonl") });
+  runtime.getState = async () => {
+    throw new Error("sensitive internal stack marker");
+  };
+  const server = createSpeciesHttpServer({ webRoot, runtime });
+  await listen(server);
+  try {
+    const response = await fetch(`${serverBaseUrl(server)}/api/room/state`);
+    assert.equal(response.status, 500);
+    const body = (await response.json()) as { error?: string };
+    assert.equal(body.error, "Internal server error");
+    assert.doesNotMatch(JSON.stringify(body), /sensitive internal stack marker/);
+  } finally {
+    await close(server);
+  }
+});
+
 test("http runtime mode is explicit for live web sessions", async () => {
   assert.equal(resolveAgentRuntimeMode(["--live"], {}), "live");
   assert.equal(resolveAgentRuntimeMode(["--seed"], { SPECIES_AGENT_MODE: "live" }), "seed");

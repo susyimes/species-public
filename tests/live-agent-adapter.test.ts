@@ -159,10 +159,14 @@ test("provider loose natural-language JSON is treated as ordinary speech", () =>
 test("live provider requests do not set model capability limiting generation parameters", async () => {
   const originalFetch = globalThis.fetch;
   const originalArkKey = process.env.ARK_API_KEY;
+  const originalArkBaseUrl = process.env.ARK_PLAN_BASE_URL;
   const requestBodies: Record<string, unknown>[] = [];
   const requestSignals: unknown[] = [];
+  const requestUrls: string[] = [];
   process.env.ARK_API_KEY = "test-ark-key";
-  globalThis.fetch = (async (_url: string | URL | Request, init?: RequestInit) => {
+  process.env.ARK_PLAN_BASE_URL = "https://ark.example.test/api////";
+  globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+    requestUrls.push(String(url));
     requestBodies.push(JSON.parse(String(init?.body)));
     requestSignals.push(init?.signal);
     return {
@@ -188,9 +192,18 @@ test("live provider requests do not set model capability limiting generation par
     } else {
       process.env.ARK_API_KEY = originalArkKey;
     }
+    if (originalArkBaseUrl === undefined) {
+      delete process.env.ARK_PLAN_BASE_URL;
+    } else {
+      process.env.ARK_PLAN_BASE_URL = originalArkBaseUrl;
+    }
   }
 
   assert.equal(requestBodies.length, 2);
+  assert.deepEqual(requestUrls, [
+    "https://ark.example.test/api/chat/completions",
+    "https://ark.example.test/api/chat/completions",
+  ]);
   for (const body of requestBodies) {
     assert.equal(Object.hasOwn(body, "max_tokens"), false);
     assert.equal(Object.hasOwn(body, "temperature"), false);

@@ -911,11 +911,12 @@ function absolutePathCandidates(text: string): string[] {
 }
 
 function cleanMentionedPath(value: string): string {
-  return value
-    .trim()
-    .replace(/[)\]}>,，。；;:]+$/g, "")
-    .replace(/\\/g, path.sep)
-    .replace(/\//g, path.sep);
+  const trimmed = value.trim();
+  let end = trimmed.length;
+  while (end > 0 && ")]}>,，。；;:".includes(trimmed[end - 1] ?? "")) {
+    end -= 1;
+  }
+  return trimmed.slice(0, end).replaceAll("\\", path.sep).replaceAll("/", path.sep);
 }
 
 function gitReadArgs(request: AgentCapabilityUseRequest): string[] | undefined {
@@ -959,10 +960,28 @@ function isSafeGitLogQueryArg(token: string): boolean {
   if (/^-n$/.test(token) || /^[1-9][0-9]{0,2}$/.test(token)) {
     return true;
   }
-  if (/^[A-Za-z0-9._/@{}~^:+-]+(?:\.\.[A-Za-z0-9._/@{}~^:+-]+)?$/.test(token) && !token.startsWith("--")) {
+  if (isSafeGitRevision(token)) {
     return true;
   }
   return false;
+}
+
+function isSafeGitRevision(token: string): boolean {
+  if (token.startsWith("--")) {
+    return false;
+  }
+  const revisions = token.split("..");
+  return revisions.length <= 2 && revisions.every((revision) => revision.length > 0 && [...revision].every(isGitRevisionCharacter));
+}
+
+function isGitRevisionCharacter(character: string): boolean {
+  const code = character.charCodeAt(0);
+  return (
+    (code >= 48 && code <= 57) ||
+    (code >= 65 && code <= 90) ||
+    (code >= 97 && code <= 122) ||
+    "._/@{}~^:+-".includes(character)
+  );
 }
 
 function findCapabilityOperation(
