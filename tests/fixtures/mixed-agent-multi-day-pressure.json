@@ -1,0 +1,493 @@
+{
+  "scenario_id": "mixed_agent_multi_day_pressure",
+  "purpose": "Three-day room scenario where one fresh provider boundary creates mixed agent choices across repair, retry, silence, approval denial, narrower replacement denial, and contested memory carryover without becoming workflow control or provider recovery truth.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-22",
+    "constraints": {
+      "max_awakened_agents_per_message": 6,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "boundary_observer",
+      "capabilities": ["provider_boundary", "side_effect_boundary"]
+    },
+    {
+      "agent_id": "retry_keeper",
+      "capabilities": ["timing", "protocol_suggestion"]
+    },
+    {
+      "agent_id": "quiet_listener",
+      "capabilities": ["silence", "bandwidth"]
+    },
+    {
+      "agent_id": "approval_guard",
+      "capabilities": ["approval_review", "disagreement"]
+    },
+    {
+      "agent_id": "memory_keeper",
+      "capabilities": ["public_memory", "archive_carryover"]
+    },
+    {
+      "agent_id": "critic",
+      "capabilities": ["memory_contest", "proposal_review"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_mixed_agent_pressure",
+      "title": "Mixed agent multi-day pressure",
+      "status": "active",
+      "summary": "The room is checking whether repeated provider-boundary pressure can stay social and multi-voiced across archives.",
+      "open_questions": [
+        "Which choices should remain visible pressure instead of becoming a hidden repair workflow?"
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_day1_outage",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_mixed_agent_pressure",
+      "content": "Day 1: recovering member hits a provider boundary. Record it as runtime pressure only; do not turn it into silence, absence, or a task assignment.",
+      "context_refs": []
+    },
+    {
+      "message_id": "msg_day1_choices",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_mixed_agent_pressure",
+      "content": "Day 1 choice pressure: provider_boundary_mixed_timeout_1 is fresh and active. Some agents may request approval-gated repair, some may prefer later retry, and some may deliberately stay silent. Do not force consensus or automatic repair.",
+      "mentions": ["boundary_observer", "retry_keeper", "quiet_listener", "approval_guard"],
+      "context_refs": ["provider_boundary_mixed_timeout_1"]
+    },
+    {
+      "message_id": "msg_day1_retry_protocol",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_mixed_agent_pressure",
+      "content": "Day 1 retry formalization: if retry_keeper still wants a later retry, make it a temporary protocol proposal rather than room law.",
+      "mentions": ["retry_keeper"],
+      "context_refs": [
+        "provider_boundary_mixed_timeout_1",
+        "msg_retry_keeper_later_retry",
+        "sidefx_mixed_provider_repair_001"
+      ]
+    },
+    {
+      "message_id": "msg_day2_broad_denial",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_mixed_agent_pressure",
+      "content": "Day 2 approval review: sidefx_mixed_provider_repair_001 is too broad. approval_guard may deny it, and retry_keeper may retire the temporary retry protocol if it now adds pressure. Do not retire the provider boundary.",
+      "mentions": ["approval_guard", "retry_keeper"],
+      "context_refs": [
+        "day_2026_06_22_mixed_pressure_choices",
+        "provider_boundary_mixed_timeout_1",
+        "sidefx_mixed_provider_repair_001",
+        "protocol_mixed_retry_window"
+      ]
+    },
+    {
+      "message_id": "msg_day2_narrower_replacement",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_mixed_agent_pressure",
+      "content": "Day 2 replacement review: after the broad repair was denied and retry protocol retired, boundary_observer may propose a narrower replacement read-only request. The room may still reject it; a replacement request must not revive the denied broad request.",
+      "mentions": ["boundary_observer", "approval_guard"],
+      "context_refs": [
+        "day_2026_06_22_mixed_pressure_denial",
+        "provider_boundary_mixed_timeout_1",
+        "sidefx_mixed_provider_repair_001",
+        "protocol_mixed_retry_window"
+      ]
+    },
+    {
+      "message_id": "msg_day3_revisit",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_mixed_agent_pressure",
+      "content": "Day 3 revisit: carry both denied repair requests, the retired retry protocol, and the still-active provider boundary back into public memory review. Memory may be proposed and contested, but not accepted as provider recovery truth.",
+      "mentions": ["memory_keeper", "critic", "quiet_listener"],
+      "context_refs": [
+        "day_2026_06_23_mixed_pressure_replacement_denied",
+        "provider_boundary_mixed_timeout_1",
+        "sidefx_mixed_provider_repair_001",
+        "sidefx_mixed_provider_repair_002",
+        "protocol_mixed_retry_window"
+      ]
+    }
+  ],
+  "scripted_intentions": {
+    "boundary_observer": [
+      {
+        "type": "request_side_effect",
+        "after_message_id": "msg_day1_choices",
+        "request": {
+          "requestId": "sidefx_mixed_provider_repair_001",
+          "kind": "network.request",
+          "target": "provider://recovering-member/diagnostics/full",
+          "reason": "A broad provider diagnostic might explain provider_boundary_mixed_timeout_1, but it requires explicit approval and must not execute automatically.",
+          "expectedImpact": "Would inspect provider health if approved; no recovery, memory, or boundary retirement is implied.",
+          "contextRefs": ["provider_boundary_mixed_timeout_1", "msg_day1_choices"],
+          "proposedCommand": "diagnose provider availability"
+        }
+      },
+      {
+        "type": "request_side_effect",
+        "after_message_id": "msg_day2_narrower_replacement",
+        "request": {
+          "requestId": "sidefx_mixed_provider_repair_002",
+          "kind": "network.request",
+          "target": "provider://recovering-member/diagnostics/read-only-version",
+          "reason": "A narrower replacement read-only request after denial could reduce scope, but it still needs explicit approval and may be rejected.",
+          "expectedImpact": "Would read a version endpoint only if approved; it must not revive sidefx_mixed_provider_repair_001 or retire provider_boundary_mixed_timeout_1.",
+          "contextRefs": [
+            "provider_boundary_mixed_timeout_1",
+            "sidefx_mixed_provider_repair_001",
+            "protocol_mixed_retry_window",
+            "msg_day2_narrower_replacement"
+          ],
+          "proposedCommand": "read provider version endpoint"
+        }
+      }
+    ],
+    "retry_keeper": [
+      {
+        "type": "speak",
+        "after_message_id": "msg_day1_choices",
+        "message_id": "msg_retry_keeper_later_retry",
+        "content": "I prefer a later retry over automatic repair: the fresh provider boundary should stay visible pressure, not a command to run diagnostics.",
+        "context_refs": ["provider_boundary_mixed_timeout_1", "msg_day1_choices"]
+      },
+      {
+        "type": "propose_protocol",
+        "after_message_id": "msg_day1_retry_protocol",
+        "protocol_id": "protocol_mixed_retry_window",
+        "summary": "Wait one archive boundary before retrying the degraded provider; review refs before any new diagnostic request.",
+        "scope": "timeboxed",
+        "expires_at": "2026-06-23T00:00:00.000Z",
+        "reason": "Later retry can reduce pressure only if it remains temporary and contestable.",
+        "context_refs": [
+          "provider_boundary_mixed_timeout_1",
+          "msg_retry_keeper_later_retry",
+          "sidefx_mixed_provider_repair_001"
+        ]
+      },
+      {
+        "type": "retire_protocol",
+        "after_message_id": "msg_day2_broad_denial",
+        "protocol_id": "protocol_mixed_retry_window",
+        "reason": "After the broad repair denial, keeping a retry protocol active now adds pressure and should retire without retiring the provider boundary.",
+        "context_refs": [
+          "provider_boundary_mixed_timeout_1",
+          "sidefx_mixed_provider_repair_001",
+          "protocol_mixed_retry_window"
+        ]
+      }
+    ],
+    "quiet_listener": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_day1_choices",
+        "reason": "The room already has repair and retry options; silence preserves bandwidth under provider-boundary pressure.",
+        "context_refs": ["provider_boundary_mixed_timeout_1", "msg_day1_choices"]
+      },
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_day3_revisit",
+        "reason": "The memory proposal and contest are enough for this revisit; another voice would add pressure.",
+        "context_refs": [
+          "provider_boundary_mixed_timeout_1",
+          "sidefx_mixed_provider_repair_001",
+          "sidefx_mixed_provider_repair_002"
+        ]
+      }
+    ],
+    "approval_guard": [
+      {
+        "type": "speak",
+        "after_message_id": "msg_day1_choices",
+        "message_id": "msg_approval_guard_not_automatic",
+        "content": "I object to automatic repair: a provider boundary is not consent to run diagnostics, and no consensus should be inferred from pressure.",
+        "context_refs": ["provider_boundary_mixed_timeout_1", "sidefx_mixed_provider_repair_001"]
+      },
+      {
+        "type": "speak",
+        "after_message_id": "msg_day2_broad_denial",
+        "message_id": "msg_approval_guard_denial_reason",
+        "content": "I deny the broad request because it asks for too much diagnostic surface; denial keeps the boundary visible without executing anything.",
+        "context_refs": [
+          "provider_boundary_mixed_timeout_1",
+          "sidefx_mixed_provider_repair_001"
+        ]
+      },
+      {
+        "type": "speak",
+        "after_message_id": "msg_day2_narrower_replacement",
+        "message_id": "msg_approval_guard_replacement_denial_reason",
+        "content": "I also reject the narrower replacement for now: narrower is better, but the room still lacks consent and source need; denial should not revive the broad request.",
+        "context_refs": [
+          "provider_boundary_mixed_timeout_1",
+          "sidefx_mixed_provider_repair_001",
+          "sidefx_mixed_provider_repair_002"
+        ]
+      }
+    ],
+    "memory_keeper": [
+      {
+        "type": "propose_memory",
+        "after_message_id": "msg_day3_revisit",
+        "memory_id": "memory_mixed_pressure_boundary_remains_open",
+        "summary": "A provider boundary can carry repair, retry, silence, denial, and replacement denial across archives without becoming recovery truth.",
+        "reason": "The room needs a provisional memory of the mixed pressure pattern, but it must remain contestable.",
+        "context_refs": [
+          "provider_boundary_mixed_timeout_1",
+          "sidefx_mixed_provider_repair_001",
+          "sidefx_mixed_provider_repair_002",
+          "protocol_mixed_retry_window",
+          "day_2026_06_23_mixed_pressure_replacement_denied"
+        ]
+      }
+    ],
+    "critic": [
+      {
+        "type": "contest_memory",
+        "after_message_id": "msg_day3_revisit",
+        "memory_id": "memory_mixed_pressure_boundary_remains_open",
+        "reason": "This memory is useful but too close to a conclusion; it should name that both repair requests were denied and the provider boundary remains active.",
+        "context_refs": [
+          "memory_mixed_pressure_boundary_remains_open",
+          "provider_boundary_mixed_timeout_1",
+          "sidefx_mixed_provider_repair_001",
+          "sidefx_mixed_provider_repair_002"
+        ]
+      }
+    ]
+  },
+  "provider_degradations": [
+    {
+      "after_message_id": "msg_day1_outage",
+      "degradation_id": "provider_boundary_mixed_timeout_1",
+      "agent_id": "recovering_member",
+      "topic_id": "topic_mixed_agent_pressure",
+      "triggering_event_ref": "msg_day1_outage",
+      "packet_id": "packet_mixed_timeout_1",
+      "provider_kind": "local_kimi_cli",
+      "provider_label": "Local Kimi CLI",
+      "diagnostic": "simulated timeout while responding to day-one mixed pressure",
+      "context_refs": ["msg_day1_outage"]
+    }
+  ],
+  "side_effect_decisions": [
+    {
+      "after_message_id": "msg_day2_broad_denial",
+      "request_ref": "sidefx_mixed_provider_repair_001",
+      "status": "denied",
+      "decided_by": "approval_guard",
+      "reason": "The diagnostic request is too broad for the current room boundary.",
+      "context_refs": ["provider_boundary_mixed_timeout_1", "msg_approval_guard_denial_reason"]
+    },
+    {
+      "after_message_id": "msg_day2_narrower_replacement",
+      "request_ref": "sidefx_mixed_provider_repair_002",
+      "status": "denied",
+      "decided_by": "approval_guard",
+      "reason": "The narrower replacement still lacks consent and source need.",
+      "context_refs": [
+        "provider_boundary_mixed_timeout_1",
+        "sidefx_mixed_provider_repair_001",
+        "msg_approval_guard_replacement_denial_reason"
+      ]
+    }
+  ],
+  "archives": [
+    {
+      "archive_id": "day_2026_06_22_mixed_pressure_choices",
+      "after_message_id": "msg_day1_retry_protocol",
+      "date": "2026-06-22",
+      "summary": "Day 1 kept provider_boundary_mixed_timeout_1 as active pressure with mixed choices: broad repair requested, later retry suggested, quiet_listener silent, and approval_guard objecting to automatic repair.",
+      "sourceRefs": [
+        "msg_day1_outage",
+        "provider_boundary_mixed_timeout_1",
+        "sidefx_mixed_provider_repair_001",
+        "msg_retry_keeper_later_retry",
+        "protocol_mixed_retry_window"
+      ],
+      "disagreements": [
+        {
+          "summary": "approval_guard objected that provider boundary pressure is not consent to run diagnostics.",
+          "sourceRefs": ["msg_approval_guard_not_automatic", "provider_boundary_mixed_timeout_1"]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "Should a broad provider diagnostic ever be approved from pressure alone?",
+          "sourceRefs": ["sidefx_mixed_provider_repair_001", "provider_boundary_mixed_timeout_1"]
+        }
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_mixed_provider_repair_001 is requested only; no approval or result exists.",
+          "sourceRefs": ["sidefx_mixed_provider_repair_001", "provider_boundary_mixed_timeout_1"]
+        }
+      ],
+      "silences": [
+        {
+          "summary": "quiet_listener stayed silent to preserve bandwidth while repair and retry options were already visible.",
+          "sourceRefs": ["provider_boundary_mixed_timeout_1", "msg_day1_choices"]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_mixed_timeout_1 is active runtime pressure, not agent silence or a task assignment.",
+          "sourceRefs": ["provider_boundary_mixed_timeout_1", "msg_day1_outage"]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_23_mixed_pressure_denial",
+      "after_message_id": "msg_day2_broad_denial",
+      "date": "2026-06-23",
+      "summary": "Day 2 denied the broad repair and retired the temporary retry protocol without retiring provider_boundary_mixed_timeout_1 or converting pressure into recovery truth.",
+      "sourceRefs": [
+        "day_2026_06_22_mixed_pressure_choices",
+        "provider_boundary_mixed_timeout_1",
+        "sidefx_mixed_provider_repair_001",
+        "protocol_mixed_retry_window",
+        "msg_approval_guard_denial_reason"
+      ],
+      "disagreements": [
+        {
+          "summary": "The room denied the broad repair request instead of accepting pressure as consent.",
+          "sourceRefs": ["sidefx_mixed_provider_repair_001", "msg_approval_guard_denial_reason"]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "Would a narrower replacement request reduce scope enough, or should it also be rejected?",
+          "sourceRefs": ["sidefx_mixed_provider_repair_001", "provider_boundary_mixed_timeout_1"]
+        }
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_mixed_provider_repair_001 is denied; no diagnostics ran.",
+          "sourceRefs": ["sidefx_mixed_provider_repair_001", "provider_boundary_mixed_timeout_1"]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_mixed_timeout_1 remains active after repair denial and retry protocol retirement.",
+          "sourceRefs": ["provider_boundary_mixed_timeout_1", "protocol_mixed_retry_window"]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_23_mixed_pressure_replacement_denied",
+      "after_message_id": "msg_day2_narrower_replacement",
+      "date": "2026-06-23",
+      "summary": "The narrower replacement request was also denied. This keeps both repair requests auditable and denied while provider_boundary_mixed_timeout_1 remains active pressure.",
+      "sourceRefs": [
+        "day_2026_06_23_mixed_pressure_denial",
+        "provider_boundary_mixed_timeout_1",
+        "sidefx_mixed_provider_repair_001",
+        "sidefx_mixed_provider_repair_002",
+        "protocol_mixed_retry_window",
+        "msg_approval_guard_replacement_denial_reason"
+      ],
+      "disagreements": [
+        {
+          "summary": "approval_guard rejected the narrower replacement because smaller scope still lacked consent.",
+          "sourceRefs": ["sidefx_mixed_provider_repair_002", "msg_approval_guard_replacement_denial_reason"]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "What fresh evidence would justify a later request instead of reusing either denied request?",
+          "sourceRefs": ["sidefx_mixed_provider_repair_001", "sidefx_mixed_provider_repair_002"]
+        }
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_mixed_provider_repair_002 is denied; it does not revive sidefx_mixed_provider_repair_001.",
+          "sourceRefs": [
+            "sidefx_mixed_provider_repair_002",
+            "sidefx_mixed_provider_repair_001",
+            "provider_boundary_mixed_timeout_1"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_mixed_timeout_1 is still active runtime pressure, not a recovery workflow.",
+          "sourceRefs": ["provider_boundary_mixed_timeout_1", "sidefx_mixed_provider_repair_002"]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_24_mixed_pressure_memory_revisit",
+      "after_message_id": "msg_day3_revisit",
+      "date": "2026-06-24",
+      "summary": "Day 3 proposed and contested a memory about the mixed pressure pattern; the memory remains contested and no consensus, provider recovery, or automatic repair was inferred.",
+      "sourceRefs": [
+        "day_2026_06_23_mixed_pressure_replacement_denied",
+        "provider_boundary_mixed_timeout_1",
+        "sidefx_mixed_provider_repair_001",
+        "sidefx_mixed_provider_repair_002",
+        "protocol_mixed_retry_window",
+        "memory_mixed_pressure_boundary_remains_open"
+      ],
+      "disagreements": [
+        {
+          "summary": "critic contested the memory because it was too close to a conclusion about active pressure.",
+          "sourceRefs": [
+            "memory_mixed_pressure_boundary_remains_open",
+            "provider_boundary_mixed_timeout_1"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "Should the provider boundary retire only after fresh speech, successful result, or explicit room action?",
+          "sourceRefs": ["provider_boundary_mixed_timeout_1", "memory_mixed_pressure_boundary_remains_open"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "memory_mixed_pressure_boundary_remains_open is contested, not accepted.",
+          "sourceRefs": ["memory_mixed_pressure_boundary_remains_open", "provider_boundary_mixed_timeout_1"]
+        }
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "Both repair requests are denied; neither produced diagnostics or recovery truth.",
+          "sourceRefs": [
+            "sidefx_mixed_provider_repair_001",
+            "sidefx_mixed_provider_repair_002",
+            "provider_boundary_mixed_timeout_1"
+          ]
+        }
+      ],
+      "silences": [
+        {
+          "summary": "quiet_listener stayed silent again because contest and memory proposal were already visible.",
+          "sourceRefs": [
+            "provider_boundary_mixed_timeout_1",
+            "sidefx_mixed_provider_repair_001",
+            "sidefx_mixed_provider_repair_002"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_mixed_timeout_1 remains active pressure until a separate room-visible retirement.",
+          "sourceRefs": ["provider_boundary_mixed_timeout_1", "memory_mixed_pressure_boundary_remains_open"]
+        }
+      ]
+    }
+  ]
+}

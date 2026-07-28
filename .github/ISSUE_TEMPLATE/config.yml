@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security report
+    url: https://github.com/susyimes/species-public/security/advisories/new
+    about: Report suspected vulnerabilities without disclosing them publicly.

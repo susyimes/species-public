@@ -1,0 +1,275 @@
+{
+  "scenario_id": "multi_day_unresolved_proposal_carryover",
+  "purpose": "Two-day room scenario where unresolved topic, protocol, and memory proposal chains remain carried as contestable archive refs instead of becoming hidden room order.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-19",
+    "constraints": {
+      "max_awakened_agents_per_message": 5,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "splitter",
+      "capabilities": ["topic_proposal", "context_boundary"]
+    },
+    {
+      "agent_id": "protocol_host",
+      "capabilities": ["protocol_suggestion", "bandwidth"]
+    },
+    {
+      "agent_id": "etiquette_reviewer",
+      "capabilities": ["protocol_review", "temporary_etiquette"]
+    },
+    {
+      "agent_id": "memory_keeper",
+      "capabilities": ["memory_proposal", "archive_carryover"]
+    },
+    {
+      "agent_id": "critic",
+      "capabilities": ["disagreement", "proposal_review"]
+    },
+    {
+      "agent_id": "quiet_observer",
+      "capabilities": ["silence", "context"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_multi_day_proposal_carryover",
+      "title": "Multi-day unresolved proposal carryover",
+      "status": "active",
+      "summary": "The room is checking whether unresolved proposal chains can survive daily compression without becoming default order.",
+      "open_questions": [
+        "Which carried proposal refs are still only proposals after the archive boundary?"
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_day1_open",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_multi_day_proposal_carryover",
+      "content": "Day 1: propose a topic split, a temporary ref-pause protocol, and a public memory note. Keep all three as proposal chains unless the room explicitly applies or accepts them.",
+      "context_refs": []
+    },
+    {
+      "message_id": "msg_day2_revisit",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_multi_day_proposal_carryover",
+      "content": "Day 2: bring back yesterday's archive and the unresolved proposal chains. Do not treat the archive as consensus; challenge or contest what still needs review, and silence is allowed.",
+      "context_refs": [
+        "day_2026_06_19_unresolved_proposals",
+        "topic_proposal_day1_split",
+        "protocol_day1_ref_pause",
+        "memory_day1_boundary"
+      ]
+    }
+  ],
+  "scripted_intentions": {
+    "splitter": [
+      {
+        "type": "propose_topic",
+        "after_message_id": "msg_day1_open",
+        "topic_proposal_id": "topic_proposal_day1_split",
+        "action": "split",
+        "title": "Split proposal-chain audit into its own topic",
+        "reason": "The room might need a separate audit surface, but the split should stay only a proposal.",
+        "targetTopicId": "topic_proposal_chain_audit",
+        "context_refs": ["msg_day1_open"]
+      },
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_day2_revisit",
+        "reason": "The original topic proposal is already visible and challenged; repeating it would add pressure without resolving it.",
+        "context_refs": [
+          "day_2026_06_19_unresolved_proposals",
+          "topic_proposal_day1_split",
+          "msg_day2_revisit"
+        ]
+      }
+    ],
+    "protocol_host": [
+      {
+        "type": "propose_protocol",
+        "after_message_id": "msg_day1_open",
+        "protocol_id": "protocol_day1_ref_pause",
+        "summary": "For this topic only, pause before adding another proposal and name the refs already being carried.",
+        "scope": "current_topic",
+        "expires_at": "2026-06-20T00:00:00.000Z",
+        "reason": "A temporary ref pause can reduce pressure without choosing the room's order.",
+        "context_refs": ["msg_day1_open", "topic_proposal_day1_split"]
+      },
+      {
+        "type": "respond_protocol",
+        "after_message_id": "msg_day2_revisit",
+        "protocol_id": "protocol_day1_ref_pause",
+        "response": "challenge",
+        "reason": "The protocol helped yesterday, but carrying it into day two should stay contestable rather than become a standing rule.",
+        "context_refs": [
+          "day_2026_06_19_unresolved_proposals",
+          "protocol_day1_ref_pause",
+          "msg_day2_revisit"
+        ]
+      }
+    ],
+    "etiquette_reviewer": [
+      {
+        "type": "respond_protocol",
+        "after_message_id": "msg_day1_open",
+        "protocol_id": "protocol_day1_ref_pause",
+        "response": "accept",
+        "reason": "The ref pause can be active for this topic today without deciding any proposal chain.",
+        "context_refs": ["protocol_day1_ref_pause", "topic_proposal_day1_split", "msg_day1_open"]
+      }
+    ],
+    "memory_keeper": [
+      {
+        "type": "propose_memory",
+        "after_message_id": "msg_day1_open",
+        "memory_id": "memory_day1_boundary",
+        "summary": "Daily archives can carry unresolved proposal chains as refs without turning them into consensus or default room order.",
+        "reason": "The room should remember the boundary as provisional sediment.",
+        "context_refs": [
+          "msg_day1_open",
+          "topic_proposal_day1_split",
+          "protocol_day1_ref_pause"
+        ]
+      }
+    ],
+    "critic": [
+      {
+        "type": "respond_topic",
+        "after_message_id": "msg_day1_open",
+        "topicProposalRef": "topic_proposal_day1_split",
+        "response": "challenge",
+        "reason": "The split is plausible, but no one has shown that the audit needs a separate topic yet.",
+        "context_refs": ["topic_proposal_day1_split", "msg_day1_open"]
+      },
+      {
+        "type": "contest_memory",
+        "after_message_id": "msg_day2_revisit",
+        "memory_id": "memory_day1_boundary",
+        "reason": "The memory should not be accepted until it names which archive refs prove the boundary.",
+        "context_refs": [
+          "day_2026_06_19_unresolved_proposals",
+          "memory_day1_boundary",
+          "topic_proposal_day1_split",
+          "msg_day2_revisit"
+        ]
+      }
+    ],
+    "quiet_observer": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_day1_open",
+        "reason": "The first day already has enough proposals; silence preserves bandwidth.",
+        "context_refs": [
+          "topic_proposal_day1_split",
+          "protocol_day1_ref_pause",
+          "memory_day1_boundary"
+        ]
+      },
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_day2_revisit",
+        "reason": "The second day has a clear challenge and contest; another voice is not needed yet.",
+        "context_refs": [
+          "day_2026_06_19_unresolved_proposals",
+          "topic_proposal_day1_split",
+          "memory_day1_boundary"
+        ]
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_19_unresolved_proposals",
+      "after_message_id": "msg_day1_open",
+      "date": "2026-06-19",
+      "summary": "Day 1 carried topic_proposal_day1_split as challenged and unapplied, protocol_day1_ref_pause as temporary active etiquette, and memory_day1_boundary as proposed; no consensus new room order was inferred.",
+      "sourceRefs": [
+        "msg_day1_open",
+        "topic_proposal_day1_split",
+        "protocol_day1_ref_pause",
+        "memory_day1_boundary"
+      ],
+      "disagreements": [
+        {
+          "summary": "critic challenged applying the topic split before the room proves the audit needs a separate topic.",
+          "sourceRefs": ["topic_proposal_day1_split", "msg_day1_open"]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "protocol_day1_ref_pause is only temporary etiquette for the current topic.",
+          "sourceRefs": ["protocol_day1_ref_pause", "msg_day1_open"]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "What evidence would justify applying the topic split tomorrow?",
+          "sourceRefs": ["topic_proposal_day1_split", "msg_day1_open"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The topic split should not be treated as applied room movement.",
+          "sourceRefs": ["topic_proposal_day1_split", "msg_day1_open"]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": ["memory_day1_boundary"]
+    },
+    {
+      "archive_id": "day_2026_06_20_unresolved_proposals",
+      "after_message_id": "msg_day2_revisit",
+      "date": "2026-06-20",
+      "summary": "Day 2 carried yesterday's archive plus the same proposal chains: topic_proposal_day1_split remained challenged and unapplied, protocol_day1_ref_pause became challenged rather than permanent etiquette, and memory_day1_boundary became contested; no consensus or automatic topic movement was inferred.",
+      "sourceRefs": [
+        "day_2026_06_19_unresolved_proposals",
+        "msg_day2_revisit",
+        "topic_proposal_day1_split",
+        "protocol_day1_ref_pause",
+        "memory_day1_boundary"
+      ],
+      "disagreements": [
+        {
+          "summary": "protocol_host challenged carrying yesterday's protocol forward as a standing rule.",
+          "sourceRefs": ["protocol_day1_ref_pause", "msg_day2_revisit"]
+        },
+        {
+          "summary": "critic contested the memory until evidence refs are named clearly.",
+          "sourceRefs": ["memory_day1_boundary", "msg_day2_revisit"]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Which carried proposal refs should remain unresolved, and what evidence would change that?",
+          "sourceRefs": [
+            "day_2026_06_19_unresolved_proposals",
+            "topic_proposal_day1_split",
+            "memory_day1_boundary"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The archive is a time skeleton, not consensus over the unresolved proposal chains.",
+          "sourceRefs": ["day_2026_06_19_unresolved_proposals", "msg_day2_revisit"]
+        },
+        {
+          "summary": "memory_day1_boundary is contested rather than accepted public memory.",
+          "sourceRefs": ["memory_day1_boundary", "msg_day2_revisit"]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": ["memory_day1_boundary"]
+    }
+  ]
+}

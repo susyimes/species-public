@@ -1,0 +1,83 @@
+{
+  "scenario_id": "accepted_memory_contested",
+  "purpose": "Accepted memory remains contestable and visible after downgrade pressure.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-17",
+    "constraints": {
+      "max_awakened_agents_per_message": 4,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "mediator",
+      "capabilities": ["room_continuity"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_memory_review",
+      "title": "Memory review",
+      "status": "active"
+    }
+  ],
+  "initial_memory": [
+    {
+      "memory_id": "memory_001",
+      "state": "accepted",
+      "summary": "Critic rounds should always happen before memory acceptance.",
+      "source_refs": ["msg_prior_001"],
+      "proposed_by": "critic"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_001",
+      "author": "mediator",
+      "authorKind": "agent",
+      "topic_id": "topic_memory_review",
+      "content": "This rule is too rigid for low-risk observations."
+    }
+  ],
+  "scripted_intentions": {
+    "mediator": [
+      {
+        "type": "contest_memory",
+        "memory_id": "memory_001",
+        "reason": "Always-on critic rounds slow ordinary room continuity.",
+        "context_refs": ["msg_001", "msg_prior_001"]
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_17",
+      "date": "2026-06-17",
+      "summary": "The room kept memory_001 visible but marked it contested after mediator objected to always-on critic rounds.",
+      "sourceRefs": ["memory_001", "msg_001", "msg_prior_001"],
+      "disagreements": [
+        {
+          "summary": "Whether critic rounds are always required remains disputed.",
+          "sourceRefs": ["memory_001", "msg_001"]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Which observations are low-risk enough to skip critic rounds?",
+          "sourceRefs": ["memory_001", "msg_001"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "memory_001 remains visible as contested.",
+          "sourceRefs": ["memory_001", "msg_001", "msg_prior_001"]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": ["memory_001"]
+    }
+  ]
+}

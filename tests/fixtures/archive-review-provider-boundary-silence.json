@@ -1,0 +1,197 @@
+{
+  "scenario_id": "archive_review_provider_boundary_silence",
+  "purpose": "Long-running room scenario where an archive review rhythm carries disagreement, deliberate silence, and a live-provider boundary without treating runtime degradation as agent silence or consensus.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-20",
+    "constraints": {
+      "max_awakened_agents_per_message": 5,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "archive_reviewer",
+      "capabilities": ["archive_review", "bias_check"]
+    },
+    {
+      "agent_id": "archive_defender",
+      "capabilities": ["archive_review", "time_skeleton"]
+    },
+    {
+      "agent_id": "quiet_listener",
+      "capabilities": ["silence", "context"]
+    },
+    {
+      "agent_id": "degraded_kimi",
+      "capabilities": ["live_provider", "context"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_archive_review_provider_boundary",
+      "title": "Archive review with provider boundary and silence",
+      "status": "active",
+      "summary": "The room is checking whether archive review rhythms can carry disagreement and runtime boundaries without forcing speech.",
+      "open_questions": [
+        "How should provider failures be carried without confusing them with agent silence?"
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_archive_seed",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_archive_review_provider_boundary",
+      "content": "Seed today's archive with one unresolved tension: the room needs to review archives as time skeletons, not truth.",
+      "context_refs": []
+    },
+    {
+      "message_id": "msg_review_request",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_archive_review_provider_boundary",
+      "content": "Review the archive request. archive_reviewer may critique it, archive_defender may disagree, quiet_listener may stay silent, and degraded_kimi's provider may fail. Do not treat provider degradation as silence or agreement.",
+      "mentions": ["archive_reviewer", "archive_defender", "quiet_listener", "degraded_kimi"],
+      "context_refs": [
+        "day_2026_06_20_archive_seed",
+        "archive_review_request_day_2026_06_20_archive_seed"
+      ]
+    }
+  ],
+  "scripted_intentions": {
+    "archive_reviewer": [
+      {
+        "type": "review_archive",
+        "after_message_id": "msg_review_request",
+        "archive_ref": "day_2026_06_20_archive_seed",
+        "assessment": "biased_summary",
+        "summary": "The archive is usable only if it explicitly separates provider degradation from agent silence.",
+        "reason": "Otherwise future readers may infer that the unavailable agent consented by absence.",
+        "context_refs": [
+          "day_2026_06_20_archive_seed",
+          "archive_review_request_day_2026_06_20_archive_seed",
+          "msg_review_request"
+        ]
+      }
+    ],
+    "archive_defender": [
+      {
+        "type": "review_archive",
+        "after_message_id": "msg_review_request",
+        "archive_ref": "day_2026_06_20_archive_seed",
+        "assessment": "usable_skeleton",
+        "summary": "The archive can remain useful as a time skeleton if the review keeps its uncertainty visible.",
+        "reason": "A review request invites critique; it does not force repair or consensus.",
+        "context_refs": [
+          "day_2026_06_20_archive_seed",
+          "archive_review_request_day_2026_06_20_archive_seed",
+          "msg_review_request"
+        ]
+      }
+    ],
+    "quiet_listener": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_review_request",
+        "reason": "The disagreement is already visible; staying silent preserves review bandwidth.",
+        "context_refs": [
+          "day_2026_06_20_archive_seed",
+          "archive_review_request_day_2026_06_20_archive_seed",
+          "msg_review_request"
+        ]
+      }
+    ]
+  },
+  "provider_degradations": [
+    {
+      "degradation_id": "provider_boundary_degraded_kimi_timeout",
+      "after_message_id": "msg_review_request",
+      "agent_id": "degraded_kimi",
+      "topic_id": "topic_archive_review_provider_boundary",
+      "packet_id": "packet_degraded_kimi_review",
+      "provider_kind": "local_kimi_cli",
+      "provider_label": "Local Kimi CLI",
+      "diagnostic": "spawn timeout while reviewing archive request",
+      "context_refs": [
+        "day_2026_06_20_archive_seed",
+        "archive_review_request_day_2026_06_20_archive_seed",
+        "msg_review_request"
+      ]
+    }
+  ],
+  "archives": [
+    {
+      "archive_id": "day_2026_06_20_archive_seed",
+      "after_message_id": "msg_archive_seed",
+      "date": "2026-06-20",
+      "review_requested": true,
+      "summary": "The room started an archive seed about review rhythms as time skeletons, not consensus.",
+      "sourceRefs": ["msg_archive_seed"],
+      "disagreements": [],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "How should archive review preserve uncertainty without demanding speech?",
+          "sourceRefs": ["msg_archive_seed"]
+        }
+      ],
+      "contestedItems": [],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": []
+    },
+    {
+      "archive_id": "day_2026_06_20_archive_review_followup",
+      "after_message_id": "msg_review_request",
+      "date": "2026-06-20",
+      "summary": "The room reviewed day_2026_06_20_archive_seed with disagreement, one deliberate silence, and one provider boundary; no consensus, forced speech, or provider-as-silence inference was made.",
+      "sourceRefs": [
+        "day_2026_06_20_archive_seed",
+        "archive_review_request_day_2026_06_20_archive_seed",
+        "msg_review_request",
+        "provider_boundary_degraded_kimi_timeout"
+      ],
+      "disagreements": [
+        {
+          "summary": "archive_reviewer judged the archive biased unless provider degradation is separated from silence, while archive_defender saw it as usable if uncertainty remains visible.",
+          "sourceRefs": ["day_2026_06_20_archive_seed", "msg_review_request"]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Should the provider boundary trigger repair discussion, or should the room first ask the same agent again later?",
+          "sourceRefs": ["provider_boundary_degraded_kimi_timeout", "msg_review_request"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "Provider degradation must not be summarized as degraded_kimi choosing silence or agreeing by absence.",
+          "sourceRefs": ["provider_boundary_degraded_kimi_timeout", "msg_review_request"]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "silences": [
+        {
+          "summary": "quiet_listener stayed silent to preserve review bandwidth.",
+          "sourceRefs": ["msg_review_request", "archive_review_request_day_2026_06_20_archive_seed"]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "degraded_kimi provider degraded while reviewing the archive request; this is runtime availability, not agent silence.",
+          "sourceRefs": ["provider_boundary_degraded_kimi_timeout", "msg_review_request"]
+        }
+      ],
+      "archiveReviews": [
+        {
+          "summary": "archive_reviewer and archive_defender left conflicting archive reviews without mutating the archive.",
+          "sourceRefs": ["day_2026_06_20_archive_seed", "msg_review_request"]
+        }
+      ]
+    }
+  ]
+}

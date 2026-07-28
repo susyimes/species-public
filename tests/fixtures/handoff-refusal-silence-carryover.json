@@ -1,0 +1,128 @@
+{
+  "scenario_id": "handoff_refusal_silence_carryover",
+  "purpose": "Long-running room scenario where a handoff is rejected, the proposer and observer may stay silent, and the daily archive carries the refusal instead of routing around it.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-19",
+    "constraints": {
+      "max_awakened_agents_per_message": 4,
+      "max_speakers_per_round": 2,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "mapper",
+      "capabilities": ["handoff_suggestion", "context_refs"]
+    },
+    {
+      "agent_id": "critic",
+      "capabilities": ["failure_analysis", "refusal"]
+    },
+    {
+      "agent_id": "quiet_observer",
+      "capabilities": ["silence", "archive_carryover"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_handoff_refusal_silence",
+      "title": "Handoff refusal and silence carryover",
+      "status": "active",
+      "summary": "The room is checking whether a rejected handoff remains a visible social state instead of triggering hidden rerouting.",
+      "open_questions": [
+        "What narrower packet would make a future handoff acceptable?"
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_handoff_pressure_001",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_handoff_refusal_silence",
+      "content": "这个 memory pressure 议题可能需要 critic，但如果 handoff 太宽，critic 可以拒绝；系统不要自动找别人接手。",
+      "context_refs": ["memory_pressure_claim_001"]
+    },
+    {
+      "message_id": "msg_handoff_pressure_002",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_handoff_refusal_silence",
+      "content": "拒绝本身就是有价值的房间信息。mapper 和 quiet_observer 都可以沉默；archive 只需要带着 rejected handoff 和 open question。",
+      "mentions": ["mapper", "quiet_observer"],
+      "context_refs": ["handoff_memory_pressure_001", "memory_pressure_claim_001"]
+    }
+  ],
+  "scripted_intentions": {
+    "mapper": [
+      {
+        "type": "propose_handoff",
+        "after_message_id": "msg_handoff_pressure_001",
+        "handoff_id": "handoff_memory_pressure_001",
+        "to_agent": "critic",
+        "reason": "The memory pressure claim needs failure analysis, but the current packet may still be broad.",
+        "context_refs": ["msg_handoff_pressure_001", "memory_pressure_claim_001"],
+        "requested_output": "Name the weakest assumption and say if the handoff is too broad.",
+        "return_to": "mapper"
+      },
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_handoff_pressure_002",
+        "reason": "After the refusal, rerouting would hide the social signal; silence preserves the open question.",
+        "context_refs": ["handoff_memory_pressure_001", "msg_handoff_pressure_002"]
+      }
+    ],
+    "critic": [
+      {
+        "type": "reject_handoff",
+        "after_message_id": "msg_handoff_pressure_001",
+        "handoff_id": "handoff_memory_pressure_001",
+        "reason": "The packet names a pressure area but not a concrete claim to inspect.",
+        "context_refs": ["handoff_memory_pressure_001", "msg_handoff_pressure_001", "memory_pressure_claim_001"]
+      }
+    ],
+    "quiet_observer": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_handoff_pressure_002",
+        "reason": "The rejected handoff and open question are already visible; no extra speech is needed.",
+        "context_refs": ["handoff_memory_pressure_001", "msg_handoff_pressure_002"]
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_19_handoff_refusal_silence",
+      "date": "2026-06-19",
+      "summary": "handoff_memory_pressure_001 was proposed and rejected as too broad; no hidden reroute or consensus handoff followed, and silence preserved the open question about the packet.",
+      "sourceRefs": [
+        "handoff_memory_pressure_001",
+        "memory_pressure_claim_001",
+        "msg_handoff_pressure_001",
+        "msg_handoff_pressure_002"
+      ],
+      "disagreements": [
+        {
+          "summary": "critic rejected the handoff because the packet lacked a concrete memory claim.",
+          "sourceRefs": ["handoff_memory_pressure_001", "msg_handoff_pressure_001", "memory_pressure_claim_001"]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Which concrete memory-pressure claim should be packaged before another handoff is proposed?",
+          "sourceRefs": ["handoff_memory_pressure_001", "memory_pressure_claim_001"]
+        }
+      ],
+      "contestedItems": [],
+      "rejectedHandoffs": [
+        {
+          "summary": "handoff_memory_pressure_001 stayed rejected; the room did not route around critic's refusal.",
+          "sourceRefs": ["handoff_memory_pressure_001", "msg_handoff_pressure_002"]
+        }
+      ],
+      "memoryDeltaRefs": []
+    }
+  ]
+}

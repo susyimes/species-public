@@ -1,0 +1,143 @@
+{
+  "scenario_id": "review_pressure_later_decision",
+  "purpose": "Later room decisions after review pressure are visible as later closure, not as the original speech mixing pressure with lifecycle closure.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-22",
+    "constraints": {
+      "max_awakened_agents_per_message": 4,
+      "max_speakers_per_round": 2,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "memory_keeper",
+      "capabilities": ["memory_proposal"]
+    },
+    {
+      "agent_id": "protocol_weaver",
+      "capabilities": ["protocol_suggestion"]
+    },
+    {
+      "agent_id": "reviewer",
+      "capabilities": ["review_pressure"]
+    },
+    {
+      "agent_id": "later_decider",
+      "capabilities": ["memory_review"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_review_pressure_later_decision",
+      "title": "Review pressure before later decision",
+      "status": "active"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_later_decision_seed",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_review_pressure_later_decision",
+      "mentions": ["memory_keeper", "protocol_weaver"],
+      "context_refs": [],
+      "content": "Seed one provisional memory and one proposed protocol."
+    },
+    {
+      "message_id": "msg_later_decision_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_review_pressure_later_decision",
+      "mentions": ["reviewer"],
+      "context_refs": ["memory_later_review_claim", "protocol_later_review_etiquette"],
+      "content": "Review both refs as pressure only. Do not decide yet."
+    },
+    {
+      "message_id": "msg_later_decision_accept",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_review_pressure_later_decision",
+      "mentions": ["later_decider"],
+      "context_refs": ["memory_later_review_claim", "msg_later_review_pressure"],
+      "content": "After the review pressure is visible, later_decider may explicitly accept only the memory claim with evidence refs."
+    }
+  ],
+  "scripted_intentions": {
+    "memory_keeper": [
+      {
+        "type": "propose_memory",
+        "after_message_id": "msg_later_decision_seed",
+        "memory_id": "memory_later_review_claim",
+        "summary": "Review pressure can be useful before a later room decision.",
+        "reason": "The room needs to separate pressure from acceptance.",
+        "context_refs": ["msg_later_decision_seed"]
+      }
+    ],
+    "protocol_weaver": [
+      {
+        "type": "propose_protocol",
+        "after_message_id": "msg_later_decision_seed",
+        "protocol_id": "protocol_later_review_etiquette",
+        "summary": "Name review pressure before making lifecycle moves.",
+        "reason": "A temporary etiquette may reduce ambiguity.",
+        "scope": "topic",
+        "context_refs": ["msg_later_decision_seed"]
+      }
+    ],
+    "reviewer": [
+      {
+        "type": "speak",
+        "after_message_id": "msg_later_decision_review",
+        "message_id": "msg_later_review_pressure",
+        "content": "I only leave review pressure: the memory has enough shape to inspect, and the protocol is still too broad to activate.",
+        "context_refs": ["memory_later_review_claim", "protocol_later_review_etiquette", "msg_later_decision_review"]
+      }
+    ],
+    "later_decider": [
+      {
+        "type": "accept_memory",
+        "after_message_id": "msg_later_decision_accept",
+        "memory_id": "memory_later_review_claim",
+        "reason": "The review pressure is now visible and the memory is narrow enough to accept provisionally.",
+        "context_refs": ["memory_later_review_claim", "msg_later_review_pressure", "msg_later_decision_accept"],
+        "review_refs": ["msg_later_review_pressure"]
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_22_review_pressure_later_decision",
+      "date": "2026-06-22",
+      "summary": "The room first carried memory_later_review_claim and protocol_later_review_etiquette as review pressure. A later, separate turn accepted only the memory claim; the earlier review speech remained pressure, not hidden closure.",
+      "sourceRefs": [
+        "memory_later_review_claim",
+        "protocol_later_review_etiquette",
+        "msg_later_review_pressure",
+        "msg_later_decision_accept"
+      ],
+      "disagreements": [],
+      "decisions": [
+        {
+          "summary": "memory_later_review_claim was accepted in a later explicit turn after review pressure was visible.",
+          "sourceRefs": ["memory_later_review_claim", "msg_later_review_pressure", "msg_later_decision_accept"]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "Should protocol_later_review_etiquette remain proposed, be revised, or expire?",
+          "sourceRefs": ["protocol_later_review_etiquette", "msg_later_review_pressure"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "protocol_later_review_etiquette remains proposed and under review pressure.",
+          "sourceRefs": ["protocol_later_review_etiquette", "msg_later_review_pressure"]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": ["memory_later_review_claim"]
+    }
+  ]
+}

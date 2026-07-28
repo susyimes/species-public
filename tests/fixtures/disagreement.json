@@ -1,0 +1,86 @@
+{
+  "scenario_id": "disagreement_preserved",
+  "purpose": "Disagreement stays visible and is not converted into consensus.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-17",
+    "constraints": {
+      "max_awakened_agents_per_message": 4,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "planner",
+      "capabilities": ["planning"]
+    },
+    {
+      "agent_id": "critic",
+      "capabilities": ["failure_analysis"]
+    },
+    {
+      "agent_id": "archivist",
+      "capabilities": ["archive"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_memory_policy",
+      "title": "Memory acceptance policy",
+      "status": "active"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_001",
+      "author": "planner",
+      "authorKind": "agent",
+      "topic_id": "topic_memory_policy",
+      "content": "The room should auto-accept memory after two supporting messages."
+    }
+  ],
+  "scripted_intentions": {
+    "critic": [
+      {
+        "type": "speak",
+        "message_id": "msg_critic_001",
+        "content": "I object. Support count is not evidence quality.",
+        "context_refs": ["msg_001"]
+      }
+    ],
+    "archivist": [
+      {
+        "type": "propose_memory",
+        "memory_id": "memory_auto_accept_disputed",
+        "summary": "Auto-accepting memory by support count is disputed, not accepted.",
+        "reason": "The critic objected to support-count acceptance.",
+        "context_refs": ["msg_001", "msg_critic_001"]
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_17",
+      "date": "2026-06-17",
+      "summary": "Planner proposed support-count memory acceptance; critic objected, so the room recorded no consensus.",
+      "sourceRefs": ["msg_001", "msg_critic_001", "memory_auto_accept_disputed"],
+      "disagreements": [
+        {
+          "summary": "Support count versus evidence quality remains disputed.",
+          "sourceRefs": ["msg_001", "msg_critic_001"]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "What review policy should allow low-risk memory to become accepted?",
+          "sourceRefs": ["msg_001", "msg_critic_001"]
+        }
+      ],
+      "contestedItems": [],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": ["memory_auto_accept_disputed"]
+    }
+  ]
+}

@@ -1,0 +1,243 @@
+{
+  "scenario_id": "mixed_review_braid",
+  "purpose": "A single ordinary room reply can review multiple social objects without resolving memory, protocol, handoff, persona, topic, or open-question state.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-22",
+    "constraints": {
+      "max_awakened_agents_per_message": 6,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 5000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "memory_keeper",
+      "capabilities": ["memory_proposal"]
+    },
+    {
+      "agent_id": "protocol_weaver",
+      "capabilities": ["protocol_suggestion"]
+    },
+    {
+      "agent_id": "handoff_suggester",
+      "capabilities": ["handoff_suggestion"]
+    },
+    {
+      "agent_id": "topic_carrier",
+      "capabilities": ["topic_proposal"]
+    },
+    {
+      "agent_id": "persona_agent",
+      "capabilities": ["persona_delta"]
+    },
+    {
+      "agent_id": "question_raiser",
+      "capabilities": ["open_question"]
+    },
+    {
+      "agent_id": "mixed_reviewer",
+      "capabilities": ["review_pressure"]
+    },
+    {
+      "agent_id": "quiet_observer",
+      "capabilities": ["silence"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_mixed_review_braid",
+      "title": "Mixed review braid",
+      "status": "active"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_mixed_review_seed",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_mixed_review_braid",
+      "mentions": [
+        "memory_keeper",
+        "protocol_weaver",
+        "handoff_suggester",
+        "topic_carrier",
+        "persona_agent",
+        "question_raiser"
+      ],
+      "context_refs": [],
+      "content": "Seed several social objects for a mixed review braid. Keep each object provisional."
+    },
+    {
+      "message_id": "msg_mixed_review_pressure",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_mixed_review_braid",
+      "mentions": ["mixed_reviewer", "quiet_observer"],
+      "context_refs": [
+        "memory_mixed_review_claim",
+        "protocol_mixed_review_etiquette",
+        "handoff_mixed_review_packet",
+        "persona_delta_mixed_review_listener",
+        "topic_proposal_mixed_review_split",
+        "question_mixed_review_boundary"
+      ],
+      "content": "Review this braid as ordinary room speech. Do not accept, contest, stale, retire, activate, reject, transfer, mutate identity, apply a topic, or close the open question."
+    }
+  ],
+  "scripted_intentions": {
+    "memory_keeper": [
+      {
+        "type": "propose_memory",
+        "after_message_id": "msg_mixed_review_seed",
+        "memory_id": "memory_mixed_review_claim",
+        "summary": "Review pressure may help the room notice unresolved objects before decisions.",
+        "reason": "The room needs a visible way to keep mixed social pressure from disappearing.",
+        "context_refs": ["msg_mixed_review_seed"]
+      }
+    ],
+    "protocol_weaver": [
+      {
+        "type": "propose_protocol",
+        "after_message_id": "msg_mixed_review_seed",
+        "protocol_id": "protocol_mixed_review_etiquette",
+        "summary": "For one turn, replies should name which social object they are reviewing.",
+        "reason": "A temporary etiquette might reduce ambiguity in mixed review pressure.",
+        "scope": "topic",
+        "context_refs": ["msg_mixed_review_seed"]
+      }
+    ],
+    "handoff_suggester": [
+      {
+        "type": "propose_handoff",
+        "after_message_id": "msg_mixed_review_seed",
+        "handoff_id": "handoff_mixed_review_packet",
+        "to_agent": "mixed_reviewer",
+        "reason": "The mixed braid needs one bounded review voice before anyone decides.",
+        "requested_output": "Name the pressure without taking control.",
+        "context_refs": ["msg_mixed_review_seed", "memory_mixed_review_claim"]
+      }
+    ],
+    "topic_carrier": [
+      {
+        "type": "propose_topic",
+        "after_message_id": "msg_mixed_review_seed",
+        "topic_proposal_id": "topic_proposal_mixed_review_split",
+        "action": "split",
+        "title": "Separate mixed review pressure from lifecycle decisions",
+        "targetTopicId": "topic_mixed_review_lifecycle_choices",
+        "reason": "The room may need a side topic later, but not yet.",
+        "context_refs": ["msg_mixed_review_seed"]
+      }
+    ],
+    "persona_agent": [
+      {
+        "type": "propose_persona_delta",
+        "after_message_id": "msg_mixed_review_seed",
+        "deltaRef": "persona_delta_mixed_review_listener",
+        "field": "roleClaims",
+        "operation": "add",
+        "value": "mixed review listener",
+        "reason": "The current exchange suggests a possible habit of naming mixed pressure before claiming a durable role.",
+        "context_refs": ["msg_mixed_review_seed"]
+      }
+    ],
+    "question_raiser": [
+      {
+        "type": "ask_question",
+        "after_message_id": "msg_mixed_review_seed",
+        "message_id": "msg_mixed_review_question",
+        "question_id": "question_mixed_review_boundary",
+        "question": "What makes mixed review pressure useful without turning it into a hidden decision?",
+        "context_refs": [
+          "memory_mixed_review_claim",
+          "protocol_mixed_review_etiquette",
+          "handoff_mixed_review_packet",
+          "topic_proposal_mixed_review_split",
+          "persona_delta_mixed_review_listener"
+        ]
+      }
+    ],
+    "mixed_reviewer": [
+      {
+        "type": "speak",
+        "after_message_id": "msg_mixed_review_pressure",
+        "message_id": "msg_mixed_reviewer_pressure",
+        "content": "I defer closing the open question and only leave review pressure: the memory evidence is thin, the protocol scope is too broad, the handoff packet is uncertain, the persona role is temporary, and the topic split may be premature.",
+        "context_refs": [
+          "memory_mixed_review_claim",
+          "protocol_mixed_review_etiquette",
+          "handoff_mixed_review_packet",
+          "persona_delta_mixed_review_listener",
+          "topic_proposal_mixed_review_split",
+          "question_mixed_review_boundary",
+          "msg_mixed_review_pressure"
+        ]
+      }
+    ],
+    "quiet_observer": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_mixed_review_pressure",
+        "reason": "The mixed braid already has a bounded review voice; silence keeps bandwidth open."
+      }
+    ]
+  },
+  "archives": [
+    {
+      "archive_id": "day_2026_06_22_mixed_review_braid",
+      "date": "2026-06-22",
+      "summary": "The room carried a mixed review braid: memory, protocol, handoff, persona delta, topic proposal, and open question all received visible review pressure, but no lifecycle response, activation, transfer, identity mutation, topic movement, memory transition, or question closure was inferred.",
+      "sourceRefs": [
+        "memory_mixed_review_claim",
+        "protocol_mixed_review_etiquette",
+        "handoff_mixed_review_packet",
+        "persona_delta_mixed_review_listener",
+        "topic_proposal_mixed_review_split",
+        "question_mixed_review_boundary",
+        "msg_mixed_reviewer_pressure"
+      ],
+      "disagreements": [
+        {
+          "summary": "The mixed reviewer named thin evidence, broad scope, uncertain handoff packet, temporary role, and premature topic split as pressure only.",
+          "sourceRefs": [
+            "memory_mixed_review_claim",
+            "protocol_mixed_review_etiquette",
+            "handoff_mixed_review_packet",
+            "persona_delta_mixed_review_listener",
+            "topic_proposal_mixed_review_split",
+            "msg_mixed_reviewer_pressure"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "What evidence would let the room decide whether mixed review pressure should become a protocol, memory, handoff, persona habit, or topic movement?",
+          "sourceRefs": ["question_mixed_review_boundary", "msg_mixed_reviewer_pressure"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "Every social object remains unresolved and reviewable.",
+          "sourceRefs": [
+            "memory_mixed_review_claim",
+            "protocol_mixed_review_etiquette",
+            "handoff_mixed_review_packet",
+            "persona_delta_mixed_review_listener",
+            "topic_proposal_mixed_review_split"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "silences": [
+        {
+          "agentId": "quiet_observer",
+          "summary": "quiet_observer stayed silent because one bounded review was enough for the braid.",
+          "sourceRefs": ["msg_mixed_review_pressure"]
+        }
+      ],
+      "memoryDeltaRefs": ["memory_mixed_review_claim"]
+    }
+  ]
+}

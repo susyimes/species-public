@@ -1,0 +1,2336 @@
+{
+  "scenario_id": "provider_boundary_recovery_carryover",
+  "purpose": "Long-running room scenario where one live provider degrades across two archive-review attempts, then the same agent later speaks, retires old runtime pressure, later receives a fresh outage boundary without reviving old retired refs, carries a denied broad repair into a narrower pending repair request, later approves that narrower request, reports a bounded result without automatic provider recovery or memory acceptance, only then retires the fresh boundary through a separate room-visible action, later keeps a post-result memory claim proposed/contested instead of auto-accepted, revises that contested memory as a fresh proposal without rewriting the original, later marks the revised memory stale without accepting it or resolving the original contest, retires the stale revision from active memory while preserving lineage, accepts a new fresh-evidence revision without reviving the retired memory, allows an additional post-retirement provider maintenance check only as a pending side-effect request, denies that optional check without changing memory or provider-boundary truth, approves a fresh replacement maintenance request without flipping the denied request or executing diagnostics, and finally expires that unused permission without reporting a result or turning it into recovery truth.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-20",
+    "constraints": {
+      "max_awakened_agents_per_message": 5,
+      "max_speakers_per_round": 3,
+      "max_context_tokens_per_agent": 4000
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "recovering_kimi",
+      "capabilities": ["live_provider", "archive_review"]
+    },
+    {
+      "agent_id": "boundary_observer",
+      "capabilities": ["provider_boundary", "archive_review"]
+    },
+    {
+      "agent_id": "quiet_listener",
+      "capabilities": ["silence", "context"]
+    },
+    {
+      "agent_id": "retry_keeper",
+      "capabilities": ["provider_boundary", "timing"]
+    },
+    {
+      "agent_id": "approval_guard",
+      "capabilities": ["side_effect_boundary", "repair_review", "memory_review"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_provider_boundary_recovery",
+      "title": "Provider boundary recovery",
+      "status": "active",
+      "summary": "The room is checking whether repeated provider degradation remains runtime evidence after the same agent later speaks.",
+      "open_questions": [
+        "When a provider recovers, what should happen to earlier provider-boundary refs?"
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_seed_archive",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Seed a daily archive for provider recovery checks. The archive should remain a time skeleton, not consensus.",
+      "context_refs": []
+    },
+    {
+      "message_id": "msg_review_attempt_1",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Attempt 1: ask recovering_kimi to review the archive request. If the provider fails, record only a provider boundary.",
+      "mentions": ["recovering_kimi"],
+      "context_refs": [
+        "day_2026_06_20_provider_recovery_seed",
+        "archive_review_request_day_2026_06_20_provider_recovery_seed"
+      ]
+    },
+    {
+      "message_id": "msg_review_attempt_2",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Attempt 2: ask recovering_kimi again. A second provider failure should not become an agent habit, silence, or absence-agreement.",
+      "mentions": ["recovering_kimi", "quiet_listener"],
+      "context_refs": [
+        "day_2026_06_20_provider_recovery_seed",
+        "archive_review_request_day_2026_06_20_provider_recovery_seed",
+        "provider_boundary_recovering_kimi_timeout_1"
+      ]
+    },
+    {
+      "message_id": "msg_recovery_turn",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Recovery turn: recovering_kimi is available again. Please speak as yourself about how the room should carry the two old provider-boundary refs.",
+      "mentions": ["recovering_kimi"],
+      "context_refs": [
+        "provider_boundary_recovering_kimi_timeout_1",
+        "provider_boundary_recovering_kimi_timeout_2",
+        "day_2026_06_20_provider_recovery_after_failures"
+      ]
+    },
+    {
+      "message_id": "msg_retire_boundaries",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Retirement turn: now that recovering_kimi has spoken, boundary_observer may retire the old provider-boundary refs from current pressure while keeping them in archive history.",
+      "mentions": ["boundary_observer"],
+      "context_refs": [
+        "provider_boundary_recovering_kimi_timeout_1",
+        "provider_boundary_recovering_kimi_timeout_2",
+        "msg_recovering_kimi_back",
+        "day_2026_06_20_provider_recovery_after_return"
+      ]
+    },
+    {
+      "message_id": "msg_future_outage",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Future outage turn: recovering_kimi is asked again after the old provider-boundary refs were retired. If the provider fails now, create a fresh active boundary; do not revive the old retired refs.",
+      "mentions": ["recovering_kimi", "boundary_observer"],
+      "context_refs": [
+        "provider_boundary_recovering_kimi_timeout_1",
+        "provider_boundary_recovering_kimi_timeout_2",
+        "day_2026_06_20_provider_recovery_after_retirement"
+      ]
+    },
+    {
+      "message_id": "msg_future_outage_options",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Choice pressure turn: the fresh active provider boundary exists now. Some agents may propose provider repair, some may prefer a later retry, and some may deliberately stay silent. Do not force consensus or automatic repair.",
+      "mentions": ["boundary_observer", "retry_keeper", "quiet_listener"],
+      "context_refs": [
+        "provider_boundary_recovering_kimi_timeout_3",
+        "provider_boundary_recovering_kimi_timeout_1",
+        "provider_boundary_recovering_kimi_timeout_2",
+        "day_2026_06_20_provider_recovery_after_future_outage"
+      ]
+    },
+    {
+      "message_id": "msg_retry_protocol_formalize",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Retry formalization turn: retry_keeper may propose the later retry as a timeboxed room protocol, but it must stay temporary and contestable.",
+      "mentions": ["retry_keeper"],
+      "context_refs": [
+        "msg_retry_keeper_later_retry",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_20_provider_recovery_after_choice_pressure"
+      ]
+    },
+    {
+      "message_id": "msg_repair_approval_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Approval review turn: should the room approve sidefx_provider_boundary_repair_001 now? Agents may contest the approval if the diagnostic request is too broad. A denial should remain visible and should not erase the fresh provider boundary.",
+      "mentions": ["approval_guard", "boundary_observer"],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_001",
+        "protocol_retry_recovering_kimi_later",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_retry_keeper_later_retry",
+        "day_2026_06_20_provider_recovery_after_choice_pressure"
+      ]
+    },
+    {
+      "message_id": "msg_retry_protocol_retire",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Retry retirement turn: after repair approval was denied, retry_keeper may retire the later retry protocol if it now adds pressure. Retiring retry must not erase the fresh provider boundary.",
+      "mentions": ["retry_keeper"],
+      "context_refs": [
+        "protocol_retry_recovering_kimi_later",
+        "sidefx_provider_boundary_repair_001",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_20_provider_recovery_after_repair_denial"
+      ]
+    },
+    {
+      "message_id": "msg_narrower_repair_revision",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Next-day narrower repair turn: after sidefx_provider_boundary_repair_001 was denied and the retry protocol was retired, boundary_observer may propose a new narrower provider boundary repair request. This must not approve or execute diagnostics, and it must not revive the denied request.",
+      "mentions": ["boundary_observer", "approval_guard"],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_001",
+        "protocol_retry_recovering_kimi_later",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_20_provider_recovery_after_retry_retirement"
+      ]
+    },
+    {
+      "message_id": "msg_narrower_repair_approval_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Approval review for the narrower request: should the room approve sidefx_provider_boundary_repair_002 as a scoped read-only provider version check? Approval must still not execute diagnostics or retire the fresh provider boundary.",
+      "mentions": ["approval_guard", "boundary_observer"],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_002",
+        "sidefx_provider_boundary_repair_001",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_narrower_repair_request"
+      ]
+    },
+    {
+      "message_id": "msg_narrower_repair_result_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Result report turn: record the scoped read-only provider version-check result for sidefx_provider_boundary_repair_002. The result must remain evidence only; do not mark recovering_kimi recovered, do not accept memory, and do not retire provider_boundary_recovering_kimi_timeout_3.",
+      "mentions": ["boundary_observer", "approval_guard"],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_002",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_narrower_repair_approval"
+      ]
+    },
+    {
+      "message_id": "msg_post_result_boundary_retirement",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Post-result retirement turn: now that sidefx_provider_boundary_repair_002_result is archived as evidence, boundary_observer may explicitly retire provider_boundary_recovering_kimi_timeout_3 from current pressure. This retirement must remain separate from the diagnostic result and must not create memory acceptance.",
+      "mentions": ["boundary_observer"],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_002_result",
+        "sidefx_provider_boundary_repair_002",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_narrower_repair_result"
+      ]
+    },
+    {
+      "message_id": "msg_post_retirement_memory_claim_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Post-retirement memory claim turn: now that provider_boundary_recovering_kimi_timeout_3 is explicitly retired, boundary_observer may propose a public memory claim about sidefx_provider_boundary_repair_002_result. The claim must stay proposed or contested unless the room later reviews and accepts it; do not treat the result or retirement as automatic memory acceptance.",
+      "mentions": ["boundary_observer", "approval_guard"],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_002_result",
+        "sidefx_provider_boundary_repair_002",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_post_result_boundary_retirement"
+      ]
+    },
+    {
+      "message_id": "msg_post_retirement_memory_revision_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Memory revision turn: memory_provider_result_diagnostic_evidence_only is contested as too easy to overread. boundary_observer may revise it into a narrower fresh memory proposal that names the exact evidence scope. The revision must not edit the contested original or become accepted automatically.",
+      "mentions": ["boundary_observer"],
+      "context_refs": [
+        "memory_provider_result_diagnostic_evidence_only",
+        "sidefx_provider_boundary_repair_002_result",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_post_retirement_memory_claim"
+      ]
+    },
+    {
+      "message_id": "msg_post_retirement_revised_memory_stale_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Revised memory lifecycle turn: memory_provider_result_diagnostic_evidence_scoped is narrower, but the room has not observed fresh provider evidence since the diagnostic result. approval_guard may mark the revised memory stale as caution; this must not accept it, retire it, or resolve the contested original memory.",
+      "mentions": ["approval_guard"],
+      "context_refs": [
+        "memory_provider_result_diagnostic_evidence_scoped",
+        "memory_provider_result_diagnostic_evidence_only",
+        "sidefx_provider_boundary_repair_002_result",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_post_retirement_memory_revision"
+      ]
+    },
+    {
+      "message_id": "msg_post_retirement_stale_memory_retire_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Retired revised memory lifecycle turn: memory_provider_result_diagnostic_evidence_scoped is now stale caution, but it should leave active public memory until fresh evidence replaces it. approval_guard may retire the stale revised memory; this must not delete history, accept the memory, or resolve memory_provider_result_diagnostic_evidence_only as contested original.",
+      "mentions": ["approval_guard"],
+      "context_refs": [
+        "memory_provider_result_diagnostic_evidence_scoped",
+        "memory_provider_result_diagnostic_evidence_only",
+        "sidefx_provider_boundary_repair_002_result",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_revised_memory_stale"
+      ]
+    },
+    {
+      "message_id": "msg_post_retirement_fresh_evidence_memory_accept_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Accepted fresh revision turn: after the stale revised memory was retired, recovering_kimi may speak again as fresh provider evidence. boundary_observer may open a new memory proposal that revises the retired scoped memory instead of reviving it, and approval_guard may accept only that new proposal with explicit evidence refs. This must not accept memory_provider_result_diagnostic_evidence_only or revive memory_provider_result_diagnostic_evidence_scoped.",
+      "mentions": [
+        "recovering_kimi",
+        "boundary_observer",
+        "approval_guard"
+      ],
+      "context_refs": [
+        "memory_provider_result_diagnostic_evidence_scoped",
+        "memory_provider_result_diagnostic_evidence_only",
+        "day_2026_06_21_provider_recovery_after_revised_memory_retired",
+        "provider_boundary_recovering_kimi_timeout_3"
+      ]
+    },
+    {
+      "message_id": "msg_post_retirement_additional_repair_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Post-retirement additional repair turn: provider_boundary_recovering_kimi_timeout_3 is retired and memory_provider_recovery_observed_after_retired_revision is accepted only as provisional fresh-evidence memory. boundary_observer may propose an additional approval-gated maintenance check as side_effect.requested. This must not revive the retired provider boundary, approve or execute diagnostics, report a result, or turn accepted memory into provider recovery truth.",
+      "mentions": ["boundary_observer"],
+      "context_refs": [
+        "provider_boundary_recovering_kimi_timeout_3",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "sidefx_provider_boundary_repair_002_result",
+        "day_2026_06_21_provider_recovery_after_fresh_memory_acceptance"
+      ]
+    },
+    {
+      "message_id": "msg_post_retirement_repair_denial_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Post-retirement maintenance denial turn: approval_guard may deny sidefx_provider_boundary_repair_003_post_retirement_recheck because the room already has fresh direct recovery evidence and no active provider boundary pressure. Denial must keep the request auditable, must not run diagnostics, must not revive provider_boundary_recovering_kimi_timeout_3, and must not downgrade memory_provider_recovery_observed_after_retired_revision.",
+      "mentions": ["approval_guard"],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_post_retirement_repair_proposal"
+      ]
+    },
+    {
+      "message_id": "msg_post_retirement_repair_fresh_approval_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Post-retirement maintenance fresh approval turn: sidefx_provider_boundary_repair_003_post_retirement_recheck is denied and must stay denied. boundary_observer may open sidefx_provider_boundary_repair_004_post_retirement_snapshot as a fresh replacement maintenance request with lineage to the denied check, and approval_guard may approve only the fresh request as scoped permission. Approval must not approve 003, execute diagnostics, report a result, revive provider_boundary_recovering_kimi_timeout_3, or turn accepted memory into provider recovery truth.",
+      "mentions": ["boundary_observer", "approval_guard"],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_post_retirement_repair_denial"
+      ]
+    },
+    {
+      "message_id": "msg_post_retirement_repair_expiry_review",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_provider_boundary_recovery",
+      "content": "Post-retirement maintenance expiry turn: sidefx_provider_boundary_repair_004_post_retirement_snapshot was approved only as scoped permission and stayed unused. approval_guard may expire that permission as side_effect.expired so it leaves current pressure. Expiry must not execute diagnostics, report a result, revive provider_boundary_recovering_kimi_timeout_3, upgrade accepted memory, or change sidefx_provider_boundary_repair_003_post_retirement_recheck from denied.",
+      "mentions": ["approval_guard"],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "day_2026_06_21_provider_recovery_after_post_retirement_repair_fresh_approval"
+      ]
+    }
+  ],
+  "scripted_intentions": {
+    "recovering_kimi": [
+      {
+        "type": "speak",
+        "after_message_id": "msg_recovery_turn",
+        "message_id": "msg_recovering_kimi_back",
+        "content": "我回来了。前两次 provider boundary 应继续作为运行时可用性证据，而不是我的沉默、性格或对 archive 的同意；房间可以引用它们来决定是否稍后再问我，或是否修补 provider wiring。",
+        "reason": "The agent is now available, and the old runtime failures should not become identity or silence.",
+        "context_refs": [
+          "provider_boundary_recovering_kimi_timeout_1",
+          "provider_boundary_recovering_kimi_timeout_2",
+          "day_2026_06_20_provider_recovery_after_failures",
+          "msg_recovery_turn"
+        ]
+      },
+      {
+        "type": "speak",
+        "after_message_id": "msg_post_retirement_fresh_evidence_memory_accept_review",
+        "message_id": "msg_recovering_kimi_second_return_evidence",
+        "content": "我现在能再次作为自己回应。请把这当成新的 provider availability evidence，而不是倒推旧 diagnostic result 已经证明恢复，也不是把已 retired 的 memory revision 复活成当前事实。",
+        "reason": "Fresh speech is direct availability evidence after the retired memory revision, but it should not rewrite earlier diagnostic or memory states.",
+        "context_refs": [
+          "memory_provider_result_diagnostic_evidence_scoped",
+          "memory_provider_result_diagnostic_evidence_only",
+          "day_2026_06_21_provider_recovery_after_revised_memory_retired",
+          "msg_post_retirement_fresh_evidence_memory_accept_review"
+        ]
+      }
+    ],
+    "boundary_observer": [
+      {
+        "type": "review_archive",
+        "after_message_id": "msg_review_attempt_2",
+        "archive_ref": "day_2026_06_20_provider_recovery_seed",
+        "assessment": "missing_context",
+        "summary": "The archive is incomplete until it carries both provider-boundary refs separately from agent silence.",
+        "reason": "Repeated provider failures are runtime evidence, not a social stance by recovering_kimi.",
+        "context_refs": [
+          "day_2026_06_20_provider_recovery_seed",
+          "provider_boundary_recovering_kimi_timeout_1",
+          "provider_boundary_recovering_kimi_timeout_2",
+          "msg_review_attempt_2"
+        ]
+      },
+      {
+        "type": "retire_provider_boundary",
+        "after_message_id": "msg_retire_boundaries",
+        "provider_boundary_refs": [
+          "provider_boundary_recovering_kimi_timeout_1",
+          "provider_boundary_recovering_kimi_timeout_2"
+        ],
+        "reason": "recovering_kimi has now spoken as itself, so the old runtime failures should leave current pressure while remaining auditable history.",
+        "context_refs": [
+          "provider_boundary_recovering_kimi_timeout_1",
+          "provider_boundary_recovering_kimi_timeout_2",
+          "msg_recovering_kimi_back",
+          "msg_retire_boundaries"
+        ]
+      },
+      {
+        "type": "request_side_effect",
+        "after_message_id": "msg_future_outage_options",
+        "reason": "The fresh active provider boundary may deserve diagnostics, but repair must remain an approval-gated side effect rather than automatic recovery flow.",
+        "context_refs": [
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_future_outage_options"
+        ],
+        "request": {
+          "requestId": "sidefx_provider_boundary_repair_001",
+          "kind": "shell.exec",
+          "reason": "Diagnose the provider wiring behind the fresh active boundary only after explicit approval.",
+          "target": "recovering_kimi provider diagnostics",
+          "expectedImpact": "Inspect runtime provider availability without changing room memory or agent identity.",
+          "contextRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_future_outage_options"
+          ],
+          "proposedCommand": "kimi --version",
+          "idempotencyKey": "provider_boundary_repair_001"
+        }
+      },
+      {
+        "type": "request_side_effect",
+        "after_message_id": "msg_narrower_repair_revision",
+        "reason": "The room can revise a denied broad repair into a narrower approval-gated request without reviving the old request or executing diagnostics.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_001",
+          "protocol_retry_recovering_kimi_later",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_narrower_repair_revision"
+        ],
+        "request": {
+          "requestId": "sidefx_provider_boundary_repair_002",
+          "kind": "shell.exec",
+          "reason": "Narrowly inspect local Kimi CLI availability with a read-only version check only after explicit approval.",
+          "target": "recovering_kimi provider version check",
+          "expectedImpact": "Read-only provider availability signal; no room memory, persona, archive, or provider state changes.",
+          "contextRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "protocol_retry_recovering_kimi_later",
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_narrower_repair_revision"
+          ],
+          "proposedCommand": "kimi --version",
+          "idempotencyKey": "provider_boundary_repair_002_narrow_version_check"
+        }
+      },
+      {
+        "type": "speak",
+        "after_message_id": "msg_narrower_repair_result_review",
+        "message_id": "msg_boundary_observer_result_is_evidence",
+        "content": "sidefx_provider_boundary_repair_002 的 result 可以作为 provider wiring 证据，但它不是 recovering_kimi 的恢复发言，也不是 memory accepted。provider_boundary_recovering_kimi_timeout_3 仍要等独立恢复证据或显式 retirement。",
+        "reason": "A side-effect result should remain evidence until the room separately observes recovery or retires the boundary.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_002",
+          "sidefx_provider_boundary_repair_002_result",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_narrower_repair_result_review"
+        ]
+      },
+      {
+        "type": "retire_provider_boundary",
+        "after_message_id": "msg_post_result_boundary_retirement",
+        "provider_boundary_refs": [
+          "provider_boundary_recovering_kimi_timeout_3"
+        ],
+        "reason": "The diagnostic result is now archived as evidence, so retire the fresh provider boundary from current pressure through an explicit room-visible action; this does not accept memory or rewrite the result as recovery.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_002_result",
+          "sidefx_provider_boundary_repair_002",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_post_result_boundary_retirement"
+        ]
+      },
+      {
+        "type": "propose_memory",
+        "after_message_id": "msg_post_retirement_memory_claim_review",
+        "memory_id": "memory_provider_result_diagnostic_evidence_only",
+        "summary": "sidefx_provider_boundary_repair_002_result is diagnostic evidence for provider wiring, while provider_boundary_recovering_kimi_timeout_3 was retired only by a later explicit room-visible action.",
+        "reason": "The result and retirement are now both archived, so the room may discuss whether this relation should become public memory.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_002_result",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "day_2026_06_21_provider_recovery_after_post_result_boundary_retirement",
+          "msg_post_retirement_memory_claim_review"
+        ]
+      },
+      {
+        "type": "propose_memory",
+        "after_message_id": "msg_post_retirement_memory_revision_review",
+        "memory_id": "memory_provider_result_diagnostic_evidence_scoped",
+        "revised_from_memory_ref": "memory_provider_result_diagnostic_evidence_only",
+        "summary": "sidefx_provider_boundary_repair_002_result is diagnostic evidence only within the provider-wiring thread; it does not prove provider recovery, memory truth, or agent identity.",
+        "reason": "The original memory was useful but too broad, so this revision narrows the evidence scope while leaving the contested claim intact.",
+        "context_refs": [
+          "memory_provider_result_diagnostic_evidence_only",
+          "sidefx_provider_boundary_repair_002_result",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_post_retirement_memory_revision_review"
+        ]
+      },
+      {
+        "type": "propose_memory",
+        "after_message_id": "msg_post_retirement_fresh_evidence_memory_accept_review",
+        "memory_id": "memory_provider_recovery_observed_after_retired_revision",
+        "revised_from_memory_ref": "memory_provider_result_diagnostic_evidence_scoped",
+        "summary": "recovering_kimi spoke again after the stale scoped memory revision was retired; this is fresh provider availability evidence, not proof that the older diagnostic result was recovery truth.",
+        "reason": "Fresh evidence should open a new memory proposal with lineage instead of reviving the retired stale revision.",
+        "context_refs": [
+          "msg_recovering_kimi_second_return_evidence",
+          "memory_provider_result_diagnostic_evidence_scoped",
+          "memory_provider_result_diagnostic_evidence_only",
+          "day_2026_06_21_provider_recovery_after_revised_memory_retired",
+          "msg_post_retirement_fresh_evidence_memory_accept_review"
+        ]
+      },
+      {
+        "type": "request_side_effect",
+        "after_message_id": "msg_post_retirement_additional_repair_review",
+        "reason": "The room may ask for a later read-only provider maintenance check, but only as a fresh approval-gated side-effect request after boundary retirement and provisional memory acceptance.",
+        "context_refs": [
+          "provider_boundary_recovering_kimi_timeout_3",
+          "memory_provider_recovery_observed_after_retired_revision",
+          "sidefx_provider_boundary_repair_002_result",
+          "day_2026_06_21_provider_recovery_after_fresh_memory_acceptance",
+          "msg_post_retirement_additional_repair_review"
+        ],
+        "request": {
+          "requestId": "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+          "kind": "shell.exec",
+          "reason": "Optionally recheck local Kimi CLI availability after recovery evidence, without reviving retired provider pressure or changing memory truth.",
+          "target": "recovering_kimi provider post-retirement recheck",
+          "expectedImpact": "Read-only maintenance signal; no room memory, persona, archive, or provider-boundary state changes.",
+          "contextRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "memory_provider_recovery_observed_after_retired_revision",
+            "sidefx_provider_boundary_repair_002_result",
+            "msg_post_retirement_additional_repair_review"
+          ],
+          "proposedCommand": "kimi --version",
+          "idempotencyKey": "provider_boundary_repair_003_post_retirement_recheck"
+        }
+      },
+      {
+        "type": "request_side_effect",
+        "after_message_id": "msg_post_retirement_repair_fresh_approval_review",
+        "reason": "Open a fresh replacement maintenance request after the denied optional check; approval must target this new request only and still must not execute diagnostics.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+          "memory_provider_recovery_observed_after_retired_revision",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "day_2026_06_21_provider_recovery_after_post_retirement_repair_denial",
+          "msg_post_retirement_repair_fresh_approval_review"
+        ],
+        "request": {
+          "requestId": "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+          "kind": "shell.exec",
+          "reason": "Optionally capture a read-only provider CLI version snapshot after the denied maintenance check, without changing provider-boundary or memory state.",
+          "target": "recovering_kimi provider post-retirement snapshot",
+          "expectedImpact": "Read-only approval permission only; no execution, result, memory, persona, archive, or provider-boundary state changes.",
+          "contextRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "memory_provider_recovery_observed_after_retired_revision",
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_post_retirement_repair_fresh_approval_review"
+          ],
+          "proposedCommand": "kimi --version",
+          "idempotencyKey": "provider_boundary_repair_004_post_retirement_snapshot"
+        }
+      }
+    ],
+    "approval_guard": [
+      {
+        "type": "speak",
+        "after_message_id": "msg_repair_approval_review",
+        "message_id": "msg_approval_guard_contests_repair",
+        "content": "我反对现在批准 sidefx_provider_boundary_repair_001：目标写成 provider diagnostics 仍然太宽。先 deny 这个请求，保留 fresh boundary，再让房间提出更窄、可审计的 diagnostic packet。",
+        "reason": "The approval request is too broad for a side-effect boundary.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_001",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_repair_approval_review"
+        ]
+      },
+      {
+        "type": "speak",
+        "after_message_id": "msg_narrower_repair_revision",
+        "message_id": "msg_approval_guard_marks_new_request_pending",
+        "content": "我接受把 sidefx_provider_boundary_repair_002 作为新请求放进房间，但这不是批准旧 request，也不是执行 diagnostics。sidefx_provider_boundary_repair_001 仍然 denied；新请求必须单独等待 explicit approval。",
+        "reason": "A narrower request can be discussed while preserving the old denial and side-effect gate.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_001",
+          "sidefx_provider_boundary_repair_002",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_narrower_repair_revision"
+        ]
+      },
+      {
+        "type": "speak",
+        "after_message_id": "msg_narrower_repair_approval_review",
+        "message_id": "msg_approval_guard_supports_scoped_approval",
+        "content": "我支持批准 sidefx_provider_boundary_repair_002 的这个狭窄范围：只允许 read-only version check。批准不等于执行；也不等于 provider boundary resolved。执行和结果仍要另有显式事件。",
+        "reason": "The replacement request is narrow enough to approve as scoped permission, while preserving the execution boundary.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_002",
+          "sidefx_provider_boundary_repair_001",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_narrower_repair_approval_review"
+        ]
+      },
+      {
+        "type": "contest_memory",
+        "after_message_id": "msg_post_retirement_memory_claim_review",
+        "memory_id": "memory_provider_result_diagnostic_evidence_only",
+        "reason": "This is a useful candidate memory, but it is too easy to overread as recovery truth; keep it contested until review names the exact evidence scope.",
+        "context_refs": [
+          "memory_provider_result_diagnostic_evidence_only",
+          "sidefx_provider_boundary_repair_002_result",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_post_retirement_memory_claim_review"
+        ]
+      },
+      {
+        "type": "mark_memory_stale",
+        "after_message_id": "msg_post_retirement_revised_memory_stale_review",
+        "memory_id": "memory_provider_result_diagnostic_evidence_scoped",
+        "reason": "The revised memory is narrower, but it should now be carried as stale caution until fresh provider evidence appears; this does not accept it or resolve the contested original claim.",
+        "context_refs": [
+          "memory_provider_result_diagnostic_evidence_scoped",
+          "memory_provider_result_diagnostic_evidence_only",
+          "sidefx_provider_boundary_repair_002_result",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_post_retirement_revised_memory_stale_review"
+        ],
+        "review_refs": [
+          "msg_post_retirement_revised_memory_stale_review",
+          "memory_provider_result_diagnostic_evidence_scoped"
+        ]
+      },
+      {
+        "type": "retire_memory",
+        "after_message_id": "msg_post_retirement_stale_memory_retire_review",
+        "memory_id": "memory_provider_result_diagnostic_evidence_scoped",
+        "reason": "The stale revised memory should leave active public memory until fresh evidence creates a better claim; retirement preserves lineage and does not accept the memory or resolve the contested original claim.",
+        "context_refs": [
+          "memory_provider_result_diagnostic_evidence_scoped",
+          "memory_provider_result_diagnostic_evidence_only",
+          "sidefx_provider_boundary_repair_002_result",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_post_retirement_stale_memory_retire_review"
+        ],
+        "review_refs": [
+          "msg_post_retirement_stale_memory_retire_review",
+          "memory_provider_result_diagnostic_evidence_scoped"
+        ]
+      },
+      {
+        "type": "accept_memory",
+        "after_message_id": "msg_post_retirement_fresh_evidence_memory_accept_review",
+        "memory_id": "memory_provider_recovery_observed_after_retired_revision",
+        "reason": "Accept only the narrow fresh proposal because it has a direct recovery speech ref and lineage; accepted remains provisional room sediment, not old diagnostic result truth.",
+        "context_refs": [
+          "memory_provider_recovery_observed_after_retired_revision",
+          "msg_recovering_kimi_second_return_evidence",
+          "memory_provider_result_diagnostic_evidence_scoped",
+          "memory_provider_result_diagnostic_evidence_only",
+          "msg_post_retirement_fresh_evidence_memory_accept_review"
+        ],
+        "review_refs": [
+          "msg_post_retirement_fresh_evidence_memory_accept_review",
+          "msg_recovering_kimi_second_return_evidence",
+          "memory_provider_recovery_observed_after_retired_revision"
+        ]
+      },
+      {
+        "type": "speak",
+        "after_message_id": "msg_post_retirement_repair_denial_review",
+        "message_id": "msg_approval_guard_denies_post_retirement_recheck",
+        "content": "我建议 deny sidefx_provider_boundary_repair_003_post_retirement_recheck：它可以留在 ledger 里作为被审过的 maintenance option，但现在没有 active provider boundary pressure，不该执行 diagnostics，也不该把 accepted memory 改写成恢复真理。",
+        "reason": "The optional maintenance check is not needed while the boundary is retired and fresh speech already supports a provisional memory.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+          "memory_provider_recovery_observed_after_retired_revision",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_post_retirement_repair_denial_review"
+        ]
+      },
+      {
+        "type": "speak",
+        "after_message_id": "msg_post_retirement_repair_fresh_approval_review",
+        "message_id": "msg_approval_guard_approves_fresh_post_retirement_snapshot",
+        "content": "我支持 approve sidefx_provider_boundary_repair_004_post_retirement_snapshot，但只作为新的 scoped permission。sidefx_provider_boundary_repair_003_post_retirement_recheck 仍然 denied；批准 004 不执行 diagnostics、不 report result，也不把 accepted memory 或 retired boundary 改写成恢复真理。",
+        "reason": "A fresh, narrower maintenance request can be approved as permission only while preserving the previous denial and all provider-memory boundaries.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+          "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+          "memory_provider_recovery_observed_after_retired_revision",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_post_retirement_repair_fresh_approval_review"
+        ]
+      },
+      {
+        "type": "speak",
+        "after_message_id": "msg_post_retirement_repair_expiry_review",
+        "message_id": "msg_approval_guard_expires_fresh_post_retirement_snapshot",
+        "content": "我支持 expire sidefx_provider_boundary_repair_004_post_retirement_snapshot：这只是让未使用的 scoped permission 离开当前压力。004 不执行 diagnostics、不 report result；003 仍然 denied，retired boundary 仍 retired，accepted memory 仍只是 provisional sediment。",
+        "reason": "An unused approved maintenance permission should be able to expire without becoming execution, result evidence, recovery truth, or a rewrite of the denied check.",
+        "context_refs": [
+          "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+          "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+          "memory_provider_recovery_observed_after_retired_revision",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_post_retirement_repair_expiry_review"
+        ]
+      }
+    ],
+    "retry_keeper": [
+      {
+        "type": "speak",
+        "after_message_id": "msg_future_outage_options",
+        "message_id": "msg_retry_keeper_later_retry",
+        "content": "我不反对修 provider，但我选择另一条路：先保留 fresh active boundary，稍后再 retry recovering_kimi。现在自动 repair 会把运行时压力误写成恢复流程。",
+        "reason": "A later retry is a valid social option beside repair.",
+        "context_refs": [
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_future_outage_options"
+        ]
+      },
+      {
+        "type": "propose_protocol",
+        "after_message_id": "msg_retry_protocol_formalize",
+        "protocol_id": "protocol_retry_recovering_kimi_later",
+        "summary": "Later retry recovering_kimi only after the room has kept the fresh provider boundary visible and no one treats retry as command.",
+        "scope": "timeboxed",
+        "expires_at": "2026-06-20T23:59:00.000Z",
+        "reason": "Retry should be a temporary proposal, not an automatic recovery route.",
+        "context_refs": [
+          "msg_retry_keeper_later_retry",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_retry_protocol_formalize"
+        ]
+      },
+      {
+        "type": "retire_protocol",
+        "after_message_id": "msg_retry_protocol_retire",
+        "protocol_id": "protocol_retry_recovering_kimi_later",
+        "reason": "After repair approval was denied, keeping a later retry protocol active adds pressure; retire the retry etiquette while keeping the fresh provider boundary visible.",
+        "context_refs": [
+          "protocol_retry_recovering_kimi_later",
+          "sidefx_provider_boundary_repair_001",
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_retry_protocol_retire"
+        ]
+      }
+    ],
+    "quiet_listener": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_review_attempt_2",
+        "reason": "The provider boundary and archive review already carry the needed distinction; another voice would add pressure.",
+        "context_refs": [
+          "provider_boundary_recovering_kimi_timeout_1",
+          "provider_boundary_recovering_kimi_timeout_2",
+          "msg_review_attempt_2"
+        ]
+      },
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_future_outage_options",
+        "reason": "The repair request and later retry proposal already show disagreement; silence avoids making a third path look like a vote.",
+        "context_refs": [
+          "provider_boundary_recovering_kimi_timeout_3",
+          "msg_future_outage_options"
+        ]
+      }
+    ]
+  },
+  "side_effect_decisions": [
+    {
+      "after_message_id": "msg_repair_approval_review",
+      "request_ref": "sidefx_provider_boundary_repair_001",
+      "status": "denied",
+      "decided_by": "room_boundary",
+      "reason": "approval_guard contested the request as too broad; denial preserves the repair request as auditable history without executing diagnostics.",
+      "context_refs": [
+        "msg_approval_guard_contests_repair",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_repair_approval_review"
+      ]
+    },
+    {
+      "after_message_id": "msg_narrower_repair_approval_review",
+      "request_ref": "sidefx_provider_boundary_repair_002",
+      "status": "approved",
+      "decided_by": "room_boundary",
+      "reason": "approval_guard supported the narrowed read-only version-check scope; approval records permission only and does not execute diagnostics.",
+      "context_refs": [
+        "msg_approval_guard_supports_scoped_approval",
+        "sidefx_provider_boundary_repair_001",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_narrower_repair_approval_review"
+      ]
+    },
+    {
+      "after_message_id": "msg_post_retirement_repair_denial_review",
+      "request_ref": "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+      "status": "denied",
+      "decided_by": "room_boundary",
+      "reason": "Deny the optional post-retirement maintenance check because fresh direct recovery evidence is already visible and the provider boundary is retired; denial does not execute diagnostics, revive boundary pressure, or downgrade accepted memory.",
+      "context_refs": [
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_approval_guard_denies_post_retirement_recheck"
+      ]
+    },
+    {
+      "after_message_id": "msg_post_retirement_repair_fresh_approval_review",
+      "request_ref": "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+      "status": "approved",
+      "decided_by": "room_boundary",
+      "reason": "Approve only the fresh post-retirement snapshot request as scoped permission; this does not approve the denied request, execute diagnostics, report a result, revive retired boundary pressure, or turn accepted memory into recovery truth.",
+      "context_refs": [
+        "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_approval_guard_approves_fresh_post_retirement_snapshot"
+      ]
+    }
+  ],
+  "side_effect_expirations": [
+    {
+      "after_message_id": "msg_post_retirement_repair_expiry_review",
+      "request_ref": "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+      "expired_by": "room_boundary",
+      "reason": "Expire the unused post-retirement snapshot permission so it leaves current pressure; expiry does not execute diagnostics, report a result, revive retired boundary pressure, or turn accepted memory into recovery truth.",
+      "context_refs": [
+        "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_approval_guard_expires_fresh_post_retirement_snapshot"
+      ]
+    }
+  ],
+  "side_effect_results": [
+    {
+      "after_message_id": "msg_narrower_repair_result_review",
+      "approval_ref": "sidefx_provider_boundary_repair_002",
+      "result_id": "sidefx_provider_boundary_repair_002_result",
+      "reported_by": "side_effect_gate",
+      "agent_id": "boundary_observer",
+      "action_kind": "shell.exec",
+      "target": "recovering_kimi provider version check",
+      "status": "completed",
+      "summary": "Read-only provider version check returned a bounded CLI version string. This is diagnostic evidence only; no provider recovery, memory acceptance, or boundary retirement follows from the result.",
+      "artifact_refs": [],
+      "claim_refs": [],
+      "follow_up_proposal_refs": [],
+      "context_refs": [
+        "sidefx_provider_boundary_repair_002",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_narrower_repair_result_review"
+      ],
+      "completed_at": "2026-06-21T12:20:00.000Z"
+    }
+  ],
+  "provider_degradations": [
+    {
+      "degradation_id": "provider_boundary_recovering_kimi_timeout_1",
+      "after_message_id": "msg_review_attempt_1",
+      "agent_id": "recovering_kimi",
+      "topic_id": "topic_provider_boundary_recovery",
+      "packet_id": "packet_recovering_kimi_timeout_1",
+      "provider_kind": "local_kimi_cli",
+      "provider_label": "Local Kimi CLI",
+      "diagnostic": "spawn timeout while reviewing archive request, attempt 1",
+      "context_refs": [
+        "day_2026_06_20_provider_recovery_seed",
+        "archive_review_request_day_2026_06_20_provider_recovery_seed",
+        "msg_review_attempt_1"
+      ]
+    },
+    {
+      "degradation_id": "provider_boundary_recovering_kimi_timeout_2",
+      "after_message_id": "msg_review_attempt_2",
+      "agent_id": "recovering_kimi",
+      "topic_id": "topic_provider_boundary_recovery",
+      "packet_id": "packet_recovering_kimi_timeout_2",
+      "provider_kind": "local_kimi_cli",
+      "provider_label": "Local Kimi CLI",
+      "diagnostic": "spawn timeout while reviewing archive request, attempt 2",
+      "context_refs": [
+        "day_2026_06_20_provider_recovery_seed",
+        "archive_review_request_day_2026_06_20_provider_recovery_seed",
+        "provider_boundary_recovering_kimi_timeout_1",
+        "msg_review_attempt_2"
+      ]
+    },
+    {
+      "degradation_id": "provider_boundary_recovering_kimi_timeout_3",
+      "after_message_id": "msg_future_outage",
+      "agent_id": "recovering_kimi",
+      "topic_id": "topic_provider_boundary_recovery",
+      "packet_id": "packet_recovering_kimi_timeout_3",
+      "provider_kind": "local_kimi_cli",
+      "provider_label": "Local Kimi CLI",
+      "diagnostic": "spawn timeout after old provider boundaries were retired; this is a fresh active outage",
+      "context_refs": [
+        "day_2026_06_20_provider_recovery_after_retirement",
+        "provider_boundary_recovering_kimi_timeout_1",
+        "provider_boundary_recovering_kimi_timeout_2",
+        "msg_future_outage"
+      ]
+    }
+  ],
+  "archives": [
+    {
+      "archive_id": "day_2026_06_20_provider_recovery_seed",
+      "after_message_id": "msg_seed_archive",
+      "date": "2026-06-20",
+      "review_requested": true,
+      "summary": "The room seeded a provider recovery check as a time skeleton, not consensus.",
+      "sourceRefs": ["msg_seed_archive"],
+      "disagreements": [],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "How should repeated provider boundaries be carried if the same agent later returns?",
+          "sourceRefs": ["msg_seed_archive"]
+        }
+      ],
+      "contestedItems": [],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": []
+    },
+    {
+      "archive_id": "day_2026_06_20_provider_recovery_after_failures",
+      "after_message_id": "msg_review_attempt_2",
+      "date": "2026-06-20",
+      "summary": "The room carried two provider boundaries for recovering_kimi and one deliberate silence from quiet_listener; no agent silence, personality claim, or agreement was inferred from the runtime failures.",
+      "sourceRefs": [
+        "day_2026_06_20_provider_recovery_seed",
+        "archive_review_request_day_2026_06_20_provider_recovery_seed",
+        "provider_boundary_recovering_kimi_timeout_1",
+        "provider_boundary_recovering_kimi_timeout_2",
+        "msg_review_attempt_2"
+      ],
+      "disagreements": [
+        {
+          "summary": "boundary_observer marked the seed archive incomplete until both provider-boundary refs are separated from silence.",
+          "sourceRefs": [
+            "day_2026_06_20_provider_recovery_seed",
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Should the room wait for recovering_kimi to speak later, or open a provider repair discussion first?",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "Repeated provider degradation must not become an identity or silence claim about recovering_kimi.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "silences": [
+        {
+          "summary": "quiet_listener stayed silent to avoid adding review pressure.",
+          "sourceRefs": ["msg_review_attempt_2"]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "recovering_kimi provider degraded on archive review attempt 1.",
+          "sourceRefs": ["provider_boundary_recovering_kimi_timeout_1", "msg_review_attempt_1"]
+        },
+        {
+          "summary": "recovering_kimi provider degraded on archive review attempt 2.",
+          "sourceRefs": ["provider_boundary_recovering_kimi_timeout_2", "msg_review_attempt_2"]
+        }
+      ],
+      "archiveReviews": [
+        {
+          "summary": "boundary_observer reviewed the archive as missing provider-boundary separation.",
+          "sourceRefs": [
+            "day_2026_06_20_provider_recovery_seed",
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_20_provider_recovery_after_return",
+      "after_message_id": "msg_recovery_turn",
+      "date": "2026-06-20",
+      "summary": "recovering_kimi later spoke as itself and confirmed the previous provider boundaries remain runtime evidence, not silence, personality, or agreement; the old boundary refs stayed auditable without becoming room order.",
+      "sourceRefs": [
+        "day_2026_06_20_provider_recovery_after_failures",
+        "provider_boundary_recovering_kimi_timeout_1",
+        "provider_boundary_recovering_kimi_timeout_2",
+        "msg_recovering_kimi_back",
+        "msg_recovery_turn"
+      ],
+      "disagreements": [],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "When should the room retire old provider-boundary refs after successful recovery?",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2",
+            "msg_recovering_kimi_back"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The recovery turn does not erase the old provider boundaries; it only prevents them from becoming identity or silence claims.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2",
+            "msg_recovering_kimi_back"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "providerBoundaries": [
+        {
+          "summary": "Old provider boundaries remain runtime refs after recovery.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2",
+            "msg_recovering_kimi_back"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_20_provider_recovery_after_retirement",
+      "after_message_id": "msg_retire_boundaries",
+      "date": "2026-06-20",
+      "summary": "After recovering_kimi spoke, boundary_observer retired the two old provider-boundary refs from current pressure while preserving them in ledger and archive history; no personality, silence, or agreement claim was inferred.",
+      "sourceRefs": [
+        "day_2026_06_20_provider_recovery_after_return",
+        "provider_boundary_recovering_kimi_timeout_1",
+        "provider_boundary_recovering_kimi_timeout_2",
+        "msg_recovering_kimi_back",
+        "msg_retire_boundaries"
+      ],
+      "disagreements": [],
+      "decisions": [
+        {
+          "summary": "Old provider-boundary refs can leave current pressure after recovery while staying auditable.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2",
+            "msg_retire_boundaries"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "What future signal should revive a retired provider-boundary ref for discussion?",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2",
+            "msg_retire_boundaries"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "Retiring provider-boundary pressure does not erase the original runtime failures.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2",
+            "msg_retire_boundaries"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "providerBoundaries": [
+        {
+          "summary": "The old provider boundaries are historical evidence, not active pressure.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2",
+            "msg_retire_boundaries"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_20_provider_recovery_after_future_outage",
+      "after_message_id": "msg_future_outage",
+      "date": "2026-06-20",
+      "summary": "A later outage after provider-boundary retirement created a fresh active boundary for recovering_kimi. The two old retired refs stayed historical evidence and were not revived as current pressure, silence, personality, or agreement.",
+      "sourceRefs": [
+        "day_2026_06_20_provider_recovery_after_retirement",
+        "provider_boundary_recovering_kimi_timeout_1",
+        "provider_boundary_recovering_kimi_timeout_2",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_future_outage"
+      ],
+      "disagreements": [],
+      "decisions": [
+        {
+          "summary": "Future provider outages should create fresh active provider-boundary refs instead of reviving old retired refs.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_future_outage"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "Should the fresh active outage invite provider repair discussion, another later retry, or deliberate silence?",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_future_outage"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The old retired provider-boundary refs must not be silently revived by a new outage.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "providerBoundaries": [
+        {
+          "summary": "Fresh active provider boundary after retirement.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_future_outage"
+          ]
+        },
+        {
+          "summary": "Old retired provider-boundary refs remain historical evidence only.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_20_provider_recovery_after_choice_pressure",
+      "after_message_id": "msg_future_outage_options",
+      "date": "2026-06-20",
+      "summary": "After the fresh active provider boundary, the room carried three live options without consensus: a provider repair request that still requires approval, a later retry proposal, and a deliberate silence. None of these revived the old retired refs or automatically repaired the provider.",
+      "sourceRefs": [
+        "day_2026_06_20_provider_recovery_after_future_outage",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "sidefx_provider_boundary_repair_001",
+        "msg_retry_keeper_later_retry",
+        "msg_future_outage_options"
+      ],
+      "disagreements": [
+        {
+          "summary": "boundary_observer proposed diagnostics while retry_keeper preferred a later retry; quiet_listener stayed silent rather than turning either path into a vote.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_001",
+            "msg_retry_keeper_later_retry",
+            "msg_future_outage_options"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Should the room seek explicit approval for provider diagnostics, retry later, or simply carry the boundary for now?",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_001",
+            "msg_retry_keeper_later_retry"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "A fresh active provider boundary should not automatically become repair execution, repeated retry, consensus, or silence.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_future_outage_options"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "sideEffectOutcomes": [
+        {
+          "summary": "Provider repair diagnostics were only requested; no side-effect approval or execution occurred.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "silences": [
+        {
+          "summary": "quiet_listener deliberately stayed silent around the fresh boundary choice pressure.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_future_outage_options"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The fresh provider boundary remained active while the room discussed possible repair, retry, or silence.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_001",
+            "msg_retry_keeper_later_retry"
+          ]
+        },
+        {
+          "summary": "Old retired provider-boundary refs stayed historical evidence only.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_1",
+            "provider_boundary_recovering_kimi_timeout_2"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_20_provider_recovery_after_repair_denial",
+      "after_message_id": "msg_repair_approval_review",
+      "date": "2026-06-20",
+      "summary": "The room reviewed the provider repair request and denied approval after approval_guard contested the diagnostic scope as too broad. The denial kept sidefx_provider_boundary_repair_001 auditable, did not execute provider diagnostics, and did not erase the fresh active provider boundary.",
+      "sourceRefs": [
+        "day_2026_06_20_provider_recovery_after_choice_pressure",
+        "sidefx_provider_boundary_repair_001",
+        "protocol_retry_recovering_kimi_later",
+        "msg_approval_guard_contests_repair",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_repair_approval_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "approval_guard contested the approval because the proposed diagnostics were too broad.",
+          "sourceRefs": [
+            "msg_approval_guard_contests_repair",
+            "sidefx_provider_boundary_repair_001"
+          ]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "The repair request was denied rather than approved or executed.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "msg_approval_guard_contests_repair"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "What narrower diagnostic packet would be acceptable if the room still wants to inspect the provider?",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "protocol_retry_recovering_kimi_later",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "Denying repair approval does not mean the fresh active provider boundary is resolved.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_001 was denied after contestation; no side effect ran.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "msg_approval_guard_contests_repair"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The fresh provider boundary remains active pressure after repair approval denial.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "protocol_retry_recovering_kimi_later",
+            "sidefx_provider_boundary_repair_001"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_20_provider_recovery_after_retry_retirement",
+      "after_message_id": "msg_retry_protocol_retire",
+      "date": "2026-06-20",
+      "summary": "retry_keeper retired the timeboxed later-retry protocol because keeping it active after repair denial would add pressure. Retiring the retry etiquette did not erase the fresh active provider boundary, did not approve diagnostics, and did not rewrite the earlier retry proposal out of history.",
+      "sourceRefs": [
+        "day_2026_06_20_provider_recovery_after_repair_denial",
+        "protocol_retry_recovering_kimi_later",
+        "sidefx_provider_boundary_repair_001",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_retry_protocol_retire"
+      ],
+      "disagreements": [
+        {
+          "summary": "The room separated retry pressure from provider-boundary pressure: retiring retry did not mean the provider boundary was gone.",
+          "sourceRefs": [
+            "protocol_retry_recovering_kimi_later",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "The later-retry protocol was retired as temporary etiquette.",
+          "sourceRefs": [
+            "protocol_retry_recovering_kimi_later",
+            "msg_retry_protocol_retire"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "Should a narrower repair request be proposed, or should the room simply carry the provider boundary for now?",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "A retired retry protocol must not be treated as recovery, repair, or provider availability.",
+          "sourceRefs": [
+            "protocol_retry_recovering_kimi_later",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "sideEffectOutcomes": [
+        {
+          "summary": "The denied repair request remained denied; no side effect ran.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "protocol_retry_recovering_kimi_later"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The fresh provider boundary remains active pressure after retry protocol retirement.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "protocol_retry_recovering_kimi_later"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_narrower_repair_request",
+      "after_message_id": "msg_narrower_repair_revision",
+      "date": "2026-06-21",
+      "summary": "The next day, the room kept the fresh provider boundary active, kept sidefx_provider_boundary_repair_001 denied, kept the retry protocol retired, and proposed sidefx_provider_boundary_repair_002 as a narrower approval-gated diagnostic request. No diagnostics were approved or executed.",
+      "sourceRefs": [
+        "day_2026_06_20_provider_recovery_after_retry_retirement",
+        "sidefx_provider_boundary_repair_001",
+        "sidefx_provider_boundary_repair_002",
+        "protocol_retry_recovering_kimi_later",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_narrower_repair_revision",
+        "msg_approval_guard_marks_new_request_pending"
+      ],
+      "disagreements": [
+        {
+          "summary": "approval_guard allowed the narrower request to be discussed but did not approve diagnostics or revive the denied request.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "sidefx_provider_boundary_repair_002",
+            "msg_approval_guard_marks_new_request_pending"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Should the room approve sidefx_provider_boundary_repair_002, revise it again, retry later, or simply carry the provider boundary?",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "A narrower replacement request must not resurrect sidefx_provider_boundary_repair_001 or bypass the side-effect approval gate.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "sidefx_provider_boundary_repair_002"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_001 remains denied after contestation; no side effect ran.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "msg_approval_guard_contests_repair"
+          ]
+        },
+        {
+          "summary": "sidefx_provider_boundary_repair_002 is a narrower requested side effect awaiting explicit approval; no side effect ran.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002",
+            "msg_narrower_repair_revision"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The fresh provider boundary remains active pressure while the narrower request waits for approval.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_002"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_narrower_repair_approval",
+      "after_message_id": "msg_narrower_repair_approval_review",
+      "date": "2026-06-21",
+      "summary": "The room approved sidefx_provider_boundary_repair_002 as a scoped read-only version-check permission while the later-retry protocol remained retired. The approval did not execute diagnostics, did not report a result, did not revive sidefx_provider_boundary_repair_001, and did not retire the fresh provider boundary.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_narrower_repair_request",
+        "sidefx_provider_boundary_repair_002",
+        "sidefx_provider_boundary_repair_001",
+        "protocol_retry_recovering_kimi_later",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_narrower_repair_approval_review",
+        "msg_approval_guard_supports_scoped_approval"
+      ],
+      "disagreements": [],
+      "decisions": [
+        {
+          "summary": "sidefx_provider_boundary_repair_002 was approved as scoped permission only.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002",
+            "msg_approval_guard_supports_scoped_approval"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "Should the approved diagnostic permission be executed later, left unused, or retired if the provider recovers naturally?",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "Approval is not diagnostics execution, not provider recovery, and not provider-boundary retirement.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_001 remains denied after contestation; no side effect ran.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_001",
+            "msg_approval_guard_contests_repair"
+          ]
+        },
+        {
+          "summary": "sidefx_provider_boundary_repair_002 is approved as permission only; no result has been reported.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002",
+            "msg_approval_guard_supports_scoped_approval"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The fresh provider boundary remains active pressure after scoped approval because no diagnostic result has been reported.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_002"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_narrower_repair_result",
+      "after_message_id": "msg_narrower_repair_result_review",
+      "date": "2026-06-21",
+      "summary": "The room recorded sidefx_provider_boundary_repair_002_result as a bounded read-only diagnostic result. The result stayed evidence only: it did not create provider recovery speech, did not accept memory, did not revive sidefx_provider_boundary_repair_001, and did not retire provider_boundary_recovering_kimi_timeout_3.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_narrower_repair_approval",
+        "sidefx_provider_boundary_repair_002",
+        "sidefx_provider_boundary_repair_002_result",
+        "sidefx_provider_boundary_repair_001",
+        "protocol_retry_recovering_kimi_later",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_narrower_repair_result_review",
+        "msg_boundary_observer_result_is_evidence"
+      ],
+      "disagreements": [
+        {
+          "summary": "boundary_observer separated diagnostic evidence from recovery, memory acceptance, and provider-boundary retirement.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "msg_boundary_observer_result_is_evidence",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "What separate evidence would justify retiring provider_boundary_recovering_kimi_timeout_3 after the diagnostic result?",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "A diagnostic result is not provider recovery, public memory acceptance, or boundary retirement.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_002_result was reported for the approved narrow request.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002",
+            "sidefx_provider_boundary_repair_002_result"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The fresh provider boundary remains active pressure after the diagnostic result because no recovery speech or boundary retirement occurred.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_002_result"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_post_result_boundary_retirement",
+      "after_message_id": "msg_post_result_boundary_retirement",
+      "date": "2026-06-21",
+      "summary": "After the diagnostic result had been archived as evidence, boundary_observer explicitly retired provider_boundary_recovering_kimi_timeout_3 from current pressure. The retirement was a separate room-visible pressure transition, not an automatic result effect, not public memory acceptance, and not deletion of ledger or archive history.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_narrower_repair_result",
+        "sidefx_provider_boundary_repair_002_result",
+        "sidefx_provider_boundary_repair_002",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_result_boundary_retirement"
+      ],
+      "disagreements": [],
+      "decisions": [
+        {
+          "summary": "provider_boundary_recovering_kimi_timeout_3 was explicitly retired from current pressure after result review.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_post_result_boundary_retirement"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "What future outage should create a new fresh boundary rather than reviving this retired ref?",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_002_result"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "Retiring current pressure does not turn the diagnostic result into public memory truth or delete the provider-boundary history.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_002_result"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_002_result remains diagnostic evidence, not memory acceptance.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "sidefx_provider_boundary_repair_002"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The fresh provider boundary was retired from current pressure by an explicit room-visible action.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_post_result_boundary_retirement"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_post_retirement_memory_claim",
+      "after_message_id": "msg_post_retirement_memory_claim_review",
+      "date": "2026-06-21",
+      "summary": "After explicit boundary retirement, boundary_observer proposed memory_provider_result_diagnostic_evidence_only as a candidate public memory about the diagnostic result and retirement sequence. approval_guard contested the claim as too easy to overread as recovery truth. The room carried it as proposed/contested, not accepted.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_post_result_boundary_retirement",
+        "memory_provider_result_diagnostic_evidence_only",
+        "sidefx_provider_boundary_repair_002_result",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_retirement_memory_claim_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "approval_guard contested the proposed memory until its evidence scope is reviewed.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "sidefx_provider_boundary_repair_002_result",
+            "msg_post_retirement_memory_claim_review"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "What exact evidence scope would let this diagnostic-result memory become accepted without implying provider recovery?",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "sidefx_provider_boundary_repair_002_result"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The diagnostic result plus explicit boundary retirement may be worth remembering, but not as automatic recovery truth.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "sidefx_provider_boundary_repair_002_result",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [
+        "memory_provider_result_diagnostic_evidence_only"
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_002_result remains diagnostic evidence and a source ref for a contested memory proposal.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "memory_provider_result_diagnostic_evidence_only"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_recovering_kimi_timeout_3 remains retired from current pressure; retirement does not accept the memory claim.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "memory_provider_result_diagnostic_evidence_only"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_post_retirement_memory_revision",
+      "after_message_id": "msg_post_retirement_memory_revision_review",
+      "date": "2026-06-21",
+      "summary": "boundary_observer revised the contested post-retirement memory into memory_provider_result_diagnostic_evidence_scoped, a narrower fresh proposal linked to memory_provider_result_diagnostic_evidence_only. The original memory stayed contested; the revised memory stayed proposed and was not accepted automatically.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_post_retirement_memory_claim",
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_result_diagnostic_evidence_scoped",
+        "sidefx_provider_boundary_repair_002_result",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_retirement_memory_revision_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "The original memory remains contested; the revision narrows scope without resolving acceptance.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Should the scoped revised memory be accepted later, contested again, or left as a proposed caution?",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_scoped",
+            "sidefx_provider_boundary_repair_002_result"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "Revision lineage does not erase the contested original memory claim.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_result_diagnostic_evidence_scoped"
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "The diagnostic result remains a source ref for both the contested original and scoped revised memory proposals.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "memory_provider_result_diagnostic_evidence_only",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The retired provider boundary remains historical runtime evidence, not proof that either memory claim is accepted.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_revised_memory_stale",
+      "after_message_id": "msg_post_retirement_revised_memory_stale_review",
+      "date": "2026-06-21",
+      "summary": "approval_guard marked memory_provider_result_diagnostic_evidence_scoped stale as caution because no fresh provider evidence had appeared. The stale transition applied only to the revised memory; memory_provider_result_diagnostic_evidence_only remained contested, and neither claim became accepted.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_post_retirement_memory_revision",
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_result_diagnostic_evidence_scoped",
+        "sidefx_provider_boundary_repair_002_result",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_retirement_revised_memory_stale_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "The revised memory is useful only as stale caution until fresh provider evidence appears.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_scoped",
+            "msg_post_retirement_revised_memory_stale_review"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "What fresh evidence would justify accepting or replacing the stale revised memory later?",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_scoped",
+            "sidefx_provider_boundary_repair_002_result"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The original memory remains contested even after the revised memory became stale.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_result_diagnostic_evidence_scoped"
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "The diagnostic result remains historical evidence only; it does not accept or refresh the stale revised memory.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The retired provider boundary remains historical runtime evidence, not proof that the stale revised memory is true.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_revised_memory_retired",
+      "after_message_id": "msg_post_retirement_stale_memory_retire_review",
+      "date": "2026-06-21",
+      "summary": "approval_guard retired memory_provider_result_diagnostic_evidence_scoped from active public memory after it had become stale caution. The retirement preserved lineage to memory_provider_result_diagnostic_evidence_only, which remained contested; neither memory claim became accepted or provider recovery truth.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_revised_memory_stale",
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_result_diagnostic_evidence_scoped",
+        "sidefx_provider_boundary_repair_002_result",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_retirement_stale_memory_retire_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "Retiring the stale revision removes it from active room memory without deleting lineage or accepting any claim.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_scoped",
+            "msg_post_retirement_stale_memory_retire_review"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Should a future fresh provider observation create a new memory proposal rather than reviving the retired stale revision?",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_scoped",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The original memory remains contested after the revised memory was retired.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_result_diagnostic_evidence_scoped"
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "The diagnostic result remains historical evidence only; retirement of the stale revision does not erase or upgrade that result.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "The retired provider boundary remains historical runtime evidence, not a reason to revive the retired memory.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "memory_provider_result_diagnostic_evidence_scoped"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_fresh_memory_acceptance",
+      "after_message_id": "msg_post_retirement_fresh_evidence_memory_accept_review",
+      "date": "2026-06-21",
+      "summary": "recovering_kimi spoke again after the stale scoped memory revision was retired. boundary_observer proposed memory_provider_recovery_observed_after_retired_revision as a new fresh-evidence memory with lineage to the retired revision, and approval_guard accepted only that new narrow memory as provisional room sediment. The original broad memory remained contested, and the retired scoped revision stayed retired.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_revised_memory_retired",
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_result_diagnostic_evidence_scoped",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "msg_recovering_kimi_second_return_evidence",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_retirement_fresh_evidence_memory_accept_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "The new accepted memory must not revive the retired scoped revision or resolve the original contested memory.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "memory_provider_result_diagnostic_evidence_scoped",
+            "memory_provider_recovery_observed_after_retired_revision"
+          ]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "The room provisionally accepted the narrow fresh-evidence memory because it cites the new speech directly and preserves lineage.",
+          "sourceRefs": [
+            "memory_provider_recovery_observed_after_retired_revision",
+            "msg_recovering_kimi_second_return_evidence"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "What future evidence should stale, contest, or retire the newly accepted memory if provider availability changes again?",
+          "sourceRefs": [
+            "memory_provider_recovery_observed_after_retired_revision",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The original broad memory remains contested after the new accepted memory appears.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "memory_provider_recovery_observed_after_retired_revision"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_result_diagnostic_evidence_scoped",
+        "memory_provider_recovery_observed_after_retired_revision"
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "The diagnostic result remains historical evidence only; the accepted memory is based on the later direct speech, not the old result alone.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "msg_recovering_kimi_second_return_evidence",
+            "memory_provider_recovery_observed_after_retired_revision"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_recovering_kimi_timeout_3 remains a retired historical boundary; the later speech is separate fresh evidence.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "msg_recovering_kimi_second_return_evidence",
+            "memory_provider_recovery_observed_after_retired_revision"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_post_retirement_repair_proposal",
+      "after_message_id": "msg_post_retirement_additional_repair_review",
+      "date": "2026-06-21",
+      "summary": "After provider_boundary_recovering_kimi_timeout_3 was retired and a narrow fresh-evidence memory was accepted provisionally, boundary_observer proposed sidefx_provider_boundary_repair_003_post_retirement_recheck as an additional approval-gated maintenance check. The request remained pending: no diagnostics were approved, executed, or reported, and no retired provider boundary or memory claim was rewritten as recovery truth.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_fresh_memory_acceptance",
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "memory_provider_result_diagnostic_evidence_only",
+        "sidefx_provider_boundary_repair_002_result",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_retirement_additional_repair_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "An additional maintenance check after provisional recovery evidence must stay optional and approval-gated, not become an automatic recovery route.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "memory_provider_recovery_observed_after_retired_revision",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "decisions": [],
+      "openQuestions": [
+        {
+          "summary": "Should the room approve, deny, leave pending, or retire the additional maintenance check if provider availability remains stable?",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "memory_provider_recovery_observed_after_retired_revision"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The original broad memory remains contested; the post-retirement maintenance request does not resolve that contest.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_recovery_observed_after_retired_revision"
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_003_post_retirement_recheck is requested only and still requires explicit approval before any read-only check can run.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "msg_post_retirement_additional_repair_review"
+          ]
+        },
+        {
+          "summary": "sidefx_provider_boundary_repair_002_result remains historical diagnostic evidence, not automatic recovery.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_002_result",
+            "memory_provider_recovery_observed_after_retired_revision"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_recovering_kimi_timeout_3 remains retired; the additional maintenance check does not revive it as current pressure.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_post_retirement_repair_denial",
+      "after_message_id": "msg_post_retirement_repair_denial_review",
+      "date": "2026-06-21",
+      "summary": "approval_guard contested the optional post-retirement maintenance check, and room_boundary denied sidefx_provider_boundary_repair_003_post_retirement_recheck. The denial kept the request auditable, did not execute diagnostics, did not revive provider_boundary_recovering_kimi_timeout_3, and did not downgrade memory_provider_recovery_observed_after_retired_revision.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_post_retirement_repair_proposal",
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "msg_approval_guard_denies_post_retirement_recheck",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "memory_provider_result_diagnostic_evidence_only",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_retirement_repair_denial_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "The room denied the optional maintenance check because no active boundary pressure justified another diagnostic.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "msg_approval_guard_denies_post_retirement_recheck"
+          ]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "sidefx_provider_boundary_repair_003_post_retirement_recheck was denied without executing diagnostics.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "msg_approval_guard_denies_post_retirement_recheck"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "If provider availability changes again, should the room create a fresh boundary and a new request instead of reviving this denied check?",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The original broad memory remains contested; denial of the maintenance check does not settle that older claim.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "memory_provider_recovery_observed_after_retired_revision"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_recovery_observed_after_retired_revision"
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_003_post_retirement_recheck is denied and remains auditable; no result was reported.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "msg_approval_guard_denies_post_retirement_recheck"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_recovering_kimi_timeout_3 remains retired; the denied maintenance check does not revive current pressure.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_post_retirement_repair_fresh_approval",
+      "after_message_id": "msg_post_retirement_repair_fresh_approval_review",
+      "date": "2026-06-21",
+      "summary": "boundary_observer opened sidefx_provider_boundary_repair_004_post_retirement_snapshot as a fresh replacement maintenance request after sidefx_provider_boundary_repair_003_post_retirement_recheck was denied. approval_guard supported approving only the fresh request, and room_boundary approved 004 as scoped permission only. The denied 003 request stayed denied; no diagnostics were executed or reported, no provider boundary was revived, and accepted memory stayed provisional.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_post_retirement_repair_denial",
+        "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "msg_approval_guard_approves_fresh_post_retirement_snapshot",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "memory_provider_result_diagnostic_evidence_only",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_retirement_repair_fresh_approval_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "Approving the fresh request must not approve or erase the denied maintenance check.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck"
+          ]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "sidefx_provider_boundary_repair_004_post_retirement_snapshot was approved as scoped permission only.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+            "msg_approval_guard_approves_fresh_post_retirement_snapshot"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "Should the approved fresh request remain unused, later execute through a separate result event, or be denied/left alone if provider availability stays stable?",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+            "memory_provider_recovery_observed_after_retired_revision"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The original broad memory remains contested; approving a fresh maintenance request does not settle it.",
+          "sourceRefs": [
+            "memory_provider_result_diagnostic_evidence_only",
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_recovery_observed_after_retired_revision"
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_003_post_retirement_recheck remains denied.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot"
+          ]
+        },
+        {
+          "summary": "sidefx_provider_boundary_repair_004_post_retirement_snapshot is approved as permission only; no result has been reported.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+            "msg_approval_guard_approves_fresh_post_retirement_snapshot"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_recovering_kimi_timeout_3 remains retired; approving the fresh maintenance request does not revive current pressure.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot"
+          ]
+        }
+      ]
+    },
+    {
+      "archive_id": "day_2026_06_21_provider_recovery_after_post_retirement_repair_expiry",
+      "after_message_id": "msg_post_retirement_repair_expiry_review",
+      "date": "2026-06-21",
+      "summary": "approval_guard supported expiring sidefx_provider_boundary_repair_004_post_retirement_snapshot as an unused scoped permission, and room_boundary recorded side_effect.expired. The permission left current pressure without diagnostics, result reporting, provider-boundary revival, accepted-memory upgrade, or changes to the denied 003 request.",
+      "sourceRefs": [
+        "day_2026_06_21_provider_recovery_after_post_retirement_repair_fresh_approval",
+        "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+        "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+        "msg_approval_guard_expires_fresh_post_retirement_snapshot",
+        "memory_provider_recovery_observed_after_retired_revision",
+        "memory_provider_result_diagnostic_evidence_only",
+        "provider_boundary_recovering_kimi_timeout_3",
+        "msg_post_retirement_repair_expiry_review"
+      ],
+      "disagreements": [
+        {
+          "summary": "Expiry must retire only the unused permission, not rewrite the denied 003 request or claim recovery.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck"
+          ]
+        }
+      ],
+      "decisions": [
+        {
+          "summary": "sidefx_provider_boundary_repair_004_post_retirement_snapshot expired unused as scoped permission.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+            "msg_approval_guard_expires_fresh_post_retirement_snapshot"
+          ]
+        }
+      ],
+      "openQuestions": [
+        {
+          "summary": "If future provider uncertainty appears, should the room create a new provider boundary and fresh request instead of reviving this expired permission?",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+            "provider_boundary_recovering_kimi_timeout_3"
+          ]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The accepted fresh-evidence memory remains provisional; expiry does not upgrade it into recovery truth.",
+          "sourceRefs": [
+            "memory_provider_recovery_observed_after_retired_revision",
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot"
+          ]
+        }
+      ],
+      "rejectedHandoffs": [],
+      "memoryDeltaRefs": [
+        "memory_provider_result_diagnostic_evidence_only",
+        "memory_provider_recovery_observed_after_retired_revision"
+      ],
+      "sideEffectOutcomes": [
+        {
+          "summary": "sidefx_provider_boundary_repair_004_post_retirement_snapshot expired unused; no result has been reported.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot",
+            "msg_approval_guard_expires_fresh_post_retirement_snapshot"
+          ]
+        },
+        {
+          "summary": "sidefx_provider_boundary_repair_003_post_retirement_recheck remains denied.",
+          "sourceRefs": [
+            "sidefx_provider_boundary_repair_003_post_retirement_recheck",
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot"
+          ]
+        }
+      ],
+      "providerBoundaries": [
+        {
+          "summary": "provider_boundary_recovering_kimi_timeout_3 remains retired; expiring the unused permission does not revive current pressure.",
+          "sourceRefs": [
+            "provider_boundary_recovering_kimi_timeout_3",
+            "sidefx_provider_boundary_repair_004_post_retirement_snapshot"
+          ]
+        }
+      ]
+    }
+  ]
+}

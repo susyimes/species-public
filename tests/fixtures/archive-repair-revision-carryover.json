@@ -1,0 +1,161 @@
+{
+  "scenario_id": "archive_repair_revision_carryover",
+  "purpose": "Archive repair must remain a contestable social object until accepted and explicitly applied as a new archive revision.",
+  "initial_room": {
+    "room_id": "room_species",
+    "date": "2026-06-19",
+    "constraints": {
+      "max_awakened_agents_per_message": 4,
+      "archive_is_time_skeleton": true
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "reviewer",
+      "capabilities": ["archive-review", "memory-boundary"]
+    },
+    {
+      "agent_id": "repairer",
+      "capabilities": ["repair-proposal", "context-refs"]
+    },
+    {
+      "agent_id": "reviser",
+      "capabilities": ["revision", "provenance"]
+    },
+    {
+      "agent_id": "quiet_listener",
+      "capabilities": ["silence", "bandwidth"]
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "topic_archive_review",
+      "title": "daily archive review",
+      "status": "active",
+      "summary": "The room is reviewing yesterday's archive as a time skeleton."
+    }
+  ],
+  "initial_archives": [
+    {
+      "archive_id": "day_2026_06_19_base",
+      "date": "2026-06-19",
+      "summary": "Base archive: the room discussed memory pressure, but it under-described the unresolved disagreement.",
+      "source_refs": ["msg_seed_memory_pressure", "memory_pressure_001"],
+      "openQuestions": [
+        {
+          "summary": "Which memory-pressure claims still need review?",
+          "sourceRefs": ["memory_pressure_001"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The archive may imply the memory pressure was resolved.",
+          "sourceRefs": ["memory_pressure_001"]
+        }
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "msg_review_archive",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_archive_review",
+      "context_refs": ["day_2026_06_19_base"],
+      "content": "Please review day_2026_06_19_base as a time skeleton, not consensus."
+    },
+    {
+      "message_id": "msg_accept_revised_repair",
+      "author": "user",
+      "authorKind": "user",
+      "topic_id": "topic_archive_review",
+      "context_refs": ["archive_repair_002"],
+      "content": "The revised repair seems bounded. Should the room accept it before any explicit application?"
+    }
+  ],
+  "scripted_intentions": {
+    "reviewer": [
+      {
+        "type": "review_archive",
+        "after_message_id": "msg_review_archive",
+        "archive_ref": "day_2026_06_19_base",
+        "assessment": "needs_repair",
+        "summary": "The archive is useful, but it compresses an unresolved memory-pressure disagreement too flatly.",
+        "reason": "The archive should stay a reviewable time skeleton.",
+        "context_refs": ["day_2026_06_19_base", "memory_pressure_001"]
+      },
+      {
+        "type": "respond_archive_repair",
+        "after_message_id": "msg_accept_revised_repair",
+        "repair_ref": "archive_repair_002",
+        "response": "accept",
+        "reason": "The revised repair keeps the disagreement visible and preserves provenance refs.",
+        "context_refs": ["archive_repair_002", "msg_accept_revised_repair"]
+      }
+    ],
+    "repairer": [
+      {
+        "type": "propose_archive_repair",
+        "after_message_id": "msg_review_archive",
+        "repair_id": "archive_repair_001",
+        "archive_ref": "day_2026_06_19_base",
+        "summary": "Add a sentence that memory pressure remained unresolved.",
+        "reason": "The current summary could be mistaken for consensus.",
+        "proposed_repair": "Record that memory pressure was noticed but not resolved, with refs to memory_pressure_001.",
+        "context_refs": ["day_2026_06_19_base", "memory_pressure_001"]
+      }
+    ],
+    "reviser": [
+      {
+        "type": "respond_archive_repair",
+        "after_message_id": "msg_review_archive",
+        "repair_ref": "archive_repair_001",
+        "response": "revise",
+        "reason": "The repair should also say the original archive remains unchanged until explicit application.",
+        "proposed_revision": "Record memory pressure as unresolved, keep memory_pressure_001 as provenance, and state that this repair only creates a new archive revision after acceptance plus explicit application.",
+        "revised_repair_id": "archive_repair_002",
+        "context_refs": ["archive_repair_001", "day_2026_06_19_base"]
+      }
+    ],
+    "quiet_listener": [
+      {
+        "type": "stay_silent",
+        "after_message_id": "msg_review_archive",
+        "reason": "The repair objects are already bounded; silence preserves room bandwidth.",
+        "context_refs": ["day_2026_06_19_base"]
+      }
+    ]
+  },
+  "archive_repair_applications": [
+    {
+      "repair_ref": "archive_repair_002",
+      "archive_ref": "day_2026_06_19_base",
+      "revised_archive_id": "day_2026_06_19_base_rev_01",
+      "reason": "Accepted revised repair was explicitly applied after the social response.",
+      "context_refs": ["archive_repair_002", "day_2026_06_19_base"]
+    }
+  ],
+  "archives": [
+    {
+      "archive_id": "day_2026_06_19_base_rev_01",
+      "date": "2026-06-19",
+      "revision_of": "day_2026_06_19_base",
+      "applied_repair_ref": "archive_repair_002",
+      "provenance_refs": ["day_2026_06_19_base", "archive_repair_002"],
+      "summary": "Revision: memory pressure remained unresolved; this is a repaired time skeleton with provenance, not consensus.",
+      "source_refs": ["day_2026_06_19_base", "archive_repair_002"],
+      "openQuestions": [
+        {
+          "summary": "Which memory-pressure claims still need review?",
+          "sourceRefs": ["memory_pressure_001", "archive_repair_002"]
+        }
+      ],
+      "contestedItems": [
+        {
+          "summary": "The base archive was repaired because unresolved memory pressure was too flat.",
+          "sourceRefs": ["day_2026_06_19_base", "archive_repair_002"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+name: Design or feature proposal
+description: Propose a bounded change to Species
+title: "[Proposal] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What room behavior or boundary is missing?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Explain the smallest useful change and how it preserves agent freedom.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and alternatives
+      description: Link relevant ledger evidence, tests, research, or rejected alternatives.
