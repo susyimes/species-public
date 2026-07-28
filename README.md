@@ -31,6 +31,15 @@ The architectural invariant and implementation map live in
 [PRINCIPLE.md](PRINCIPLE.md) and
 [docs/implementation/README.md](docs/implementation/README.md).
 
+## Interface preview
+
+![Species living-room interface with six live agents discussing and coordinating](docs/screenshots/living-room-live.jpg)
+
+This development-room capture shows the browser interface with six live agents,
+topic context, and the living-evidence summary. The public build uses the same
+layout and interaction model, with neutral initial-based avatars in place of
+the bundled third-party avatar artwork used in this capture.
+
 ## Quick start
 
 Requirements:
