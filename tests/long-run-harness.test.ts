@@ -615,6 +615,63 @@ test("long-run harness defaults to a run-scoped ledger artifact", async () => {
   assert.notEqual(report.ledgerPath, path.join(process.cwd(), ".species", "long-run-room-ledger.jsonl"));
 });
 
+test("long-run harness waits for autonomous background turns before reading evidence", async () => {
+  let runtimeStarted = false;
+  let backgroundPollCount = 0;
+  let autonomousBackgroundIdleObserved = false;
+  const fakeRuntime = {
+    getState: async () => {
+      if (!runtimeStarted) {
+        return {
+          ...fakeState(),
+          metrics: [
+            ["0", "active background turns"],
+            ["0", "queued background turns"],
+            ["0", "active autonomous background turns"],
+            ["0", "queued autonomous background turns"],
+          ],
+        };
+      }
+
+      backgroundPollCount += 1;
+      const autonomousBackgroundActive = backgroundPollCount < 3;
+      if (!autonomousBackgroundActive) {
+        autonomousBackgroundIdleObserved = true;
+      }
+      return {
+        ...fakeState(),
+        metrics: [
+          ["0", "active background turns"],
+          ["0", "queued background turns"],
+          [autonomousBackgroundActive ? "1" : "0", "active autonomous background turns"],
+          ["0", "queued autonomous background turns"],
+        ],
+      };
+    },
+    postUserMessage: async () => undefined,
+    runAutonomousTick: async () => {
+      runtimeStarted = true;
+      return undefined;
+    },
+    rawEvents: async () => {
+      assert.equal(
+        autonomousBackgroundIdleObserved,
+        true,
+        "the harness read evidence before autonomous background turns became idle",
+      );
+      return [];
+    },
+  };
+
+  await runLongRunHarness({
+    durationMs: 1,
+    tickIntervalMs: 1,
+    runtime: fakeRuntime as never,
+  });
+
+  assert.equal(backgroundPollCount >= 3, true);
+});
+
 test("long-run harness CLI exits non-zero when the evidence report fails", async () => {
   const dir = await mkdtemp(path.join(os.tmpdir(), "species-long-run-cli-fail-"));
   try {
