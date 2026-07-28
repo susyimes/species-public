@@ -4,7 +4,7 @@ import { join } from "node:path";
 import test from "node:test";
 
 import { maskSecret } from "../src/agents/providerConfig";
-import { runAgentSmoke } from "../src/agents/smoke";
+import { isTrustedProviderEndpoint, runAgentSmoke } from "../src/agents/smoke";
 import { seedAgentDefinitions } from "../src/agents/definitions";
 import { defaultPersonas, personaForAgent, seedAgents } from "../src";
 
@@ -156,6 +156,20 @@ test("agent smoke checks Ark Plan model readiness", async () => {
   const serialized = JSON.stringify(report);
   assert.doesNotMatch(serialized, /sk-[A-Za-z0-9]{12,}/);
   assert.doesNotMatch(serialized, /tp-[A-Za-z0-9]{12,}/);
+});
+
+test("provider endpoint smoke checks validate URL structure and host boundaries", () => {
+  assert.equal(isTrustedProviderEndpoint("https://api.kimi.com/coding/v1", "api.kimi.com", "/coding"), true);
+  assert.equal(
+    isTrustedProviderEndpoint("https://ark.cn-beijing.volces.com/api/plan/v3", "ark.cn-beijing.volces.com", "/api/plan/v3"),
+    true,
+  );
+  assert.equal(isTrustedProviderEndpoint("https://api.xiaomimimo.com/v1", "xiaomimimo.com", undefined, true), true);
+  assert.equal(isTrustedProviderEndpoint("https://xiaomimimo.com.evil.test/v1", "xiaomimimo.com", undefined, true), false);
+  assert.equal(isTrustedProviderEndpoint("https://api.kimi.com.evil.test/coding", "api.kimi.com", "/coding"), false);
+  assert.equal(isTrustedProviderEndpoint("https://user@api.kimi.com/coding", "api.kimi.com", "/coding"), false);
+  assert.equal(isTrustedProviderEndpoint("http://api.kimi.com/coding", "api.kimi.com", "/coding"), false);
+  assert.equal(isTrustedProviderEndpoint("https://api.kimi.com/not-coding", "api.kimi.com", "/coding"), false);
 });
 
 test("seed agents start unassigned so role claims can emerge from ledger history", () => {

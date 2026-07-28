@@ -7991,12 +7991,48 @@ function sanitizeOptionalRef(ref: string | undefined): string | undefined {
 }
 
 function stableRefSuffix(...parts: readonly string[]): string {
+  const output: string[] = [];
+  let previousReplacement = false;
+  let scanned = 0;
+
+  outer: for (let partIndex = 0; partIndex < parts.length; partIndex += 1) {
+    const part = parts[partIndex] ?? "";
+    if (partIndex > 0 && output.length > 0 && output.at(-1) !== "_") {
+      output.push("_");
+    }
+    for (const character of part) {
+      scanned += 1;
+      if (scanned > 4_096) {
+        break outer;
+      }
+      if (isStableRefCharacter(character)) {
+        if (character !== "_" || output.length > 0) {
+          output.push(character);
+        }
+        previousReplacement = false;
+      } else if (!previousReplacement && output.length > 0) {
+        output.push("_");
+        previousReplacement = true;
+      }
+      if (output.length >= 96) {
+        break outer;
+      }
+    }
+  }
+
+  while (output.at(-1) === "_") {
+    output.pop();
+  }
+  return output.join("") || "request";
+}
+
+function isStableRefCharacter(character: string): boolean {
+  const code = character.charCodeAt(0);
   return (
-    parts
-      .join("_")
-      .replace(/[^A-Za-z0-9_:.@-]+/g, "_")
-      .replace(/^_+|_+$/g, "")
-      .slice(0, 96) || "request"
+    (code >= 48 && code <= 57) ||
+    (code >= 65 && code <= 90) ||
+    (code >= 97 && code <= 122) ||
+    "_:.@-".includes(character)
   );
 }
 

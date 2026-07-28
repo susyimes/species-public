@@ -2982,9 +2982,8 @@ export async function invokeKimiCodeProvider(request: ProviderIntentionRequest):
     throw new Error(`Kimi Code API key is missing; checked ${request.agent.provider.apiKeyEnv.join(", ")}`);
   }
 
-  const baseUrl = (firstConfiguredEnvValue(request.agent.provider.baseUrlEnv)?.value ?? request.agent.provider.defaultBaseUrl).replace(
-    /\/+$/,
-    "",
+  const baseUrl = stripTrailingUrlSlashes(
+    firstConfiguredEnvValue(request.agent.provider.baseUrlEnv)?.value ?? request.agent.provider.defaultBaseUrl,
   );
   const model = firstConfiguredEnvValue(request.agent.provider.modelEnv)?.value ?? request.agent.provider.defaultModel;
   const userAgent =
@@ -3030,7 +3029,7 @@ export async function invokeMimoProvider(request: ProviderIntentionRequest): Pro
     throw new Error("MiMo API key is missing");
   }
 
-  const baseUrl = (config.baseUrl ?? request.agent.provider.defaultBaseUrl).replace(/\/+$/, "");
+  const baseUrl = stripTrailingUrlSlashes(config.baseUrl ?? request.agent.provider.defaultBaseUrl);
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
@@ -4550,9 +4549,8 @@ export async function invokeArkOpenAIProvider(request: ProviderIntentionRequest)
     throw new Error(`Ark API key is missing; checked ${request.agent.provider.apiKeyEnv.join(", ")}`);
   }
 
-  const baseUrl = (firstConfiguredEnvValue(request.agent.provider.baseUrlEnv)?.value ?? request.agent.provider.defaultBaseUrl).replace(
-    /\/+$/,
-    "",
+  const baseUrl = stripTrailingUrlSlashes(
+    firstConfiguredEnvValue(request.agent.provider.baseUrlEnv)?.value ?? request.agent.provider.defaultBaseUrl,
   );
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
@@ -4610,6 +4608,14 @@ function providerCapabilityRepairQuestion(
 
 function bearerToken(apiKey: string): string {
   return /^Bearer\s+/i.test(apiKey) ? apiKey : `Bearer ${apiKey}`;
+}
+
+function stripTrailingUrlSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 47) {
+    end -= 1;
+  }
+  return value.slice(0, end);
 }
 
 function defaultKimiMinIntervalMs(): number {

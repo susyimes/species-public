@@ -56,7 +56,7 @@ async function smokeAgent(agent: SpeciesSeedAgent): Promise<AgentSmokeResult> {
       },
       {
         name: "Kimi Code API endpoint",
-        ok: baseUrl.includes("api.kimi.com/coding"),
+        ok: isTrustedProviderEndpoint(baseUrl, "api.kimi.com", "/coding"),
         detail: baseUrl,
       },
       {
@@ -101,7 +101,7 @@ async function smokeAgent(agent: SpeciesSeedAgent): Promise<AgentSmokeResult> {
       },
       {
         name: "Ark Plan endpoint",
-        ok: baseUrl.includes("ark.cn-beijing.volces.com/api/plan/v3"),
+        ok: isTrustedProviderEndpoint(baseUrl, "ark.cn-beijing.volces.com", "/api/plan/v3"),
         detail: baseUrl,
       },
       {
@@ -141,7 +141,7 @@ async function smokeAgent(agent: SpeciesSeedAgent): Promise<AgentSmokeResult> {
     },
     {
       name: "MiMo endpoint",
-      ok: (config?.baseUrl ?? agent.provider.defaultBaseUrl).includes("xiaomimimo.com"),
+      ok: isTrustedProviderEndpoint(config?.baseUrl ?? agent.provider.defaultBaseUrl, "xiaomimimo.com", undefined, true),
       detail: config?.baseUrl ?? agent.provider.defaultBaseUrl,
     },
   ];
@@ -161,6 +161,36 @@ async function smokeAgent(agent: SpeciesSeedAgent): Promise<AgentSmokeResult> {
       apiKeyHint: "missing",
     },
   };
+}
+
+export function isTrustedProviderEndpoint(
+  value: string,
+  expectedHostname: string,
+  requiredPathPrefix?: string,
+  allowSubdomains = false,
+): boolean {
+  try {
+    const parsed = new URL(value);
+    const hostname = parsed.hostname.toLowerCase();
+    const expected = expectedHostname.toLowerCase();
+    const hostnameMatches = hostname === expected || (allowSubdomains && hostname.endsWith(`.${expected}`));
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.username.length > 0 ||
+      parsed.password.length > 0 ||
+      (parsed.port.length > 0 && parsed.port !== "443") ||
+      !hostnameMatches
+    ) {
+      return false;
+    }
+    if (!requiredPathPrefix) {
+      return true;
+    }
+    const prefix = requiredPathPrefix.startsWith("/") ? requiredPathPrefix : `/${requiredPathPrefix}`;
+    return parsed.pathname === prefix || parsed.pathname.startsWith(`${prefix}/`);
+  } catch {
+    return false;
+  }
 }
 
 if (require.main === module) {
