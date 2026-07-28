@@ -4772,12 +4772,16 @@ async function waitForRuntimeBackgroundIdle(runtime: SpeciesRoomRuntime, timeout
   const deadline = Date.now() + timeoutMs;
   for (;;) {
     const state = await runtime.getState();
-    const active = runtimeStateMetricNumber(state, "active background turns");
-    const queued = runtimeStateMetricNumber(state, "queued background turns");
-    if (active === undefined && queued === undefined) {
+    const backgroundCounts = [
+      runtimeStateMetricNumber(state, "active background turns"),
+      runtimeStateMetricNumber(state, "queued background turns"),
+      runtimeStateMetricNumber(state, "active autonomous background turns"),
+      runtimeStateMetricNumber(state, "queued autonomous background turns"),
+    ];
+    if (backgroundCounts.every((count) => count === undefined)) {
       return;
     }
-    if ((active ?? 0) === 0 && (queued ?? 0) === 0) {
+    if (backgroundCounts.every((count) => (count ?? 0) === 0)) {
       return;
     }
     if (Date.now() >= deadline) {
